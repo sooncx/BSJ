@@ -1,0 +1,84 @@
+.carRecharge{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  .header{
+    padding: 10px 17px;
+    &__top{
+      width: 100%;
+      display: flex;
+      line-height: 40px;
+      justify-content: space-between;
+      &__left,&__right{
+        display:flex;
+        flex-wrap: wrap;
+      }
+      &__right{
+        button{
+          margin-left: 8px;
+        }
+      }
+    }
+    &__bottom{
+      display: flex;
+      flex-wrap: wrap;
+      .item{
+        margin-top: 8px;
+      }
+    }
+    .item{
+      label{
+        display: inline-block;
+        margin-right:8px;
+      }
+      .group{
+        display: inline-block;
+      }
+      .dateInput{
+        input{
+          width: 50px;
+        }
+      }
+      margin-right:24px;
+    }
+    .date{
+      display: flex;
+      flex-wrap: wrap;
+      > span{
+        color:#0E60DB;
+        margin-right: 8px;
+        cursor: pointer;
+      }
+      .active{
+        border-bottom: 1px solid #0E60DB;
+      }
+    }
+  }
+  .content{
+    display: flex;
+    flex: 1;
+    padding: 0 10px;
+    flex-direction: column;
+    .table{
+      flex:1;
+      position: relative;
+      border: 1px solid #e8e8e8;
+    }
+    .page{
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      &__left{
+        button{
+          margin-left: 8px;
+        }
+      }
+      &__right{
+        ul{
+          line-height: 32px;
+        }
+      }
+    }
+  }
+}

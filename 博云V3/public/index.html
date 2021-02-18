@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title>博云车联</title>
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_2162112_4qz1n5jti5l.css" />
+  <!--加载百度地图-->
+  <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=3.0&ak=B6aG5hbpslZkTCqKTM88C9tBg7M60k8G"></script>
+  <!-- 百度地图鼠标绘制工具 -->
+  <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js">
+  </script>
+  <!-- 百度地图路况图工具 -->
+  <script type="text/javascript" src="http://api.map.baidu.com/library/TrafficControl/1.4/src/TrafficControl_min.js">
+  </script>
+  <!-- 百度地图自定义infowindow工具 -->
+  <script type="text/javascript" src="http://api.map.baidu.com/library/InfoBox/1.2/src/InfoBox_min.js"></script>
+  <!-- 百度地图点聚合工具 BmapMarkerClusterer修改了代码，引用本地修改版-->
+  <script type="text/javascript" src="http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js">
+  </script>
+  <script type="text/javascript" src="BmapMarkerClusterer.js"></script>
+  <!-- 百度地图热力图工具 -->
+  <script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+  <!-- 百度地图测距工具 -->
+  <script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool.js"></script>
+  <!-- 高德地图 -->
+  <script type="text/javascript"
+    src='https://webapi.amap.com/maps?v=2.0&key=8ebe8b1bf92a362d7e8bc8a75c01be8f&plugin=AMap.MarkerClusterer,AMap.AutoComplete,AMap.Driving,AMap.Transfer,AMap.Walking,AMap.CitySearch,AMap.DistrictSearch,AMap.MouseTool,AMap.Geocoder,AMap.RangingTool'>
+  </script>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+      Please enable it to continue.</strong>
+  </noscript>
+  <script src="config.js"></script>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+import Vue from 'vue';
+import {
+  Button,
+  ButtonGroup,
+  Input,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Carousel,
+  CarouselItem,
+  Checkbox,
+  Menu,
+  MenuItem,
+  MenuItemGroup,
+  Submenu,
+  Table,
+  TableColumn,
+  Scrollbar,
+  Select,
+  Option,
+  Tabs,
+  TabPane,
+  DatePicker,
+  RadioGroup,
+  RadioButton,
+  Dialog,
+  Form,
+  FormItem,
+  Tooltip,
+  Message,
+  Pagination,
+  Autocomplete,
+  Loading,
+  Row,
+  Col,
+  MessageBox,
+  Progress,
+  Collapse,
+  CollapseItem,
+  Tree,
+  InputNumber
+} from 'element-ui';
+
+Vue.use(Button);
+Vue.use(ButtonGroup);
+Vue.use(Input);
+Vue.use(Dropdown);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
+Vue.use(Carousel);
+Vue.use(CarouselItem);
+Vue.use(Checkbox);
+Vue.use(Menu);
+Vue.use(MenuItem);
+Vue.use(MenuItemGroup);
+Vue.use(Submenu);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(Scrollbar);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(Tabs);
+Vue.use(TabPane);
+Vue.use(DatePicker);
+Vue.use(RadioGroup);
+Vue.use(RadioButton);
+Vue.use(Dialog);
+Vue.use(Form);
+Vue.use(FormItem);
+Vue.use(Tooltip);
+Vue.use(Pagination);
+Vue.use(Autocomplete);
+Vue.use(Loading);
+Vue.use(Row);
+Vue.use(Col);
+Vue.use(Collapse);
+Vue.use(CollapseItem);
+Vue.use(Progress);
+Vue.use(Tree);
+Vue.use(InputNumber);
+Vue.prototype.$msg = Message;
+Vue.prototype.$msgBox = MessageBox;

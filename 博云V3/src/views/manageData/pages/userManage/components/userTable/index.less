@@ -1,0 +1,39 @@
+.userTable{
+  background-color: #ffffff;
+  flex:1;
+  display: flex;
+  height: 100%;
+  width: calc(100% - 285px);
+  flex-direction: column;
+  &__top{
+    width: 100%;
+    height: 51px;
+    line-height: 51px;
+    padding:0 17px;
+    font-size: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    .userTable__top__left{
+      span{
+        color:#0E60DB;
+      }
+    }
+    .userTable__top__right button:first-child{
+      color:while;
+      margin-right:12px;
+    }
+  }
+  &__content{
+    overflow-y: auto;
+    flex:1;
+  }
+  &__pager {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 20px;
+    border-top: 1px solid #d9e0e9;
+  }
+}

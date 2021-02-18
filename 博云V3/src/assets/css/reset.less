@@ -1,0 +1,305 @@
+@import "~ant-design-vue/dist/antd.less"; // 引入官方提供的 less 样式入口文件
+@font-face {
+  // 字体
+  font-family: "DIN Regular";
+  src: url("../font/DIN REGULAR.OTF") format("truetype");
+}
+body,
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 14px;
+  color: #333;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+
+textarea {
+  resize: none;
+  background: #f3f7fb;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+  box-sizing: border-box;
+  padding: 10px;
+  outline: 0;
+  width: 100%;
+  color: #828588;
+  &::placeholder {
+    color: #c5c7d9;
+  }
+}
+
+input::placeholder {
+  color: #c5c7d9;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+  // 双击禁止选中文字
+  // -moz-user-select: none; /*火狐*/
+  // -webkit-user-select: none; /*webkit浏览器*/
+  // -ms-user-select: none; /*IE10*/
+  // -khtml-user-select: none; /*早期浏览器*/
+  // user-select: none;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+  color: #333;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// element reset 开始
+.el-pagination {
+  text-align: right;
+}
+
+.el-table--scrollable-x .el-table__body-wrapper {
+  height: calc(100% - 44px);
+  overflow-y: auto;
+}
+
+.el-input {
+  outline: none;
+}
+.el-input__inner:-webkit-autofill,
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  background-color: transparent;
+  background-image: none;
+  transition: background-color 50000s ease-in-out 0s; //背景色透明  生效时长  过渡效果  启用时延迟的时间
+}
+.el-input__inner,
+input {
+  background-color: transparent;
+}
+.el-input__inner::-webkit-autofill,
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important; //关于解决输入框背景颜色
+  -webkit-text-fill-color: rgba(
+    255,
+    255,
+    255,
+    1
+  ) !important; //关于接输入框文字颜色
+}
+.el-textarea__inner {
+  border-radius: 0 !important;
+}
+.el-input__inner {
+  border-radius: 0 !important;
+}
+.el-slider__button {
+  box-sizing: border-box;
+}
+.el-dialog__body {
+  padding: 0;
+}
+.el-dialog__header {
+  padding: 0;
+}
+.el-dialog__headerbtn {
+  top: 10px;
+  right: 16px;
+}
+.el-dialog__footer {
+  padding: 10px 16px;
+  border-top: 1px solid #d9e0e9;
+}
+.el-popover.el-popper {
+  min-width: 30px;
+  z-index: 999999 !important;
+}
+.el-message-box__wrapper {
+  z-index: 9999999 !important;
+}
+// element reset 结束
+
+// 自定义
+.userSelect {
+  * {
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+}
+.notuserSelect {
+  * {
+    -moz-user-select: none; /*火狐*/
+    -webkit-user-select: none; /*webkit浏览器*/
+    -ms-user-select: none; /*IE10*/
+    -khtml-user-select: none; /*早期浏览器*/
+    user-select: none;
+  }
+}
+.msgBox_cx {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 20px !important;
+  min-width: 100px !important;
+  background: rgba(0, 0, 0, 0.727) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.msgIcon_cx {
+  display: none !important;
+}
+// 高德地图 开始
+.amap-logo {
+  display: none !important;
+}
+
+.amap-copyright {
+  display: none !important;
+}
+// 高德地图 结束
+.ant-popover-inner-content {
+  padding: 0 !important;
+}
+.ant-time-picker-panel {
+  z-index: 999999 !important;
+}
+.ant-message {
+  z-index: 999999 !important;
+}
+// Ant Design Vue
+@primary-color: #0e60db; // 全局主色
+@link-color: #145ae8; // 链接色
+@success-color: #39c518; // 成功色
+@warning-color: #c51818; // 警告色
+@error-color: #c51818; // 错误色
+@font-size-base: 14px; // 主字号
+@heading-color: #0e60db; // 标题色
+@text-color: #333333; // 主文本色
+@text-color-secondary: #666666; // 次文本色
+@disabled-color: #c5c5c5; // 失效色
+@border-radius-base: 0px; // 组件/浮层圆角
+@border-color-base: #d9e0e9; // 边框色
+@box-shadow-base: 0 4px 8px #999; // 浮层阴影

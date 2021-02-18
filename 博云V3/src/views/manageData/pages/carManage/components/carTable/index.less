@@ -1,0 +1,26 @@
+.carContent{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .carTable{
+    flex:1;
+    overflow-y: auto;
+  }
+  .cartPager{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 20px;
+    width: 100%;
+    border-top: 1px solid #d9e0e9;
+  }
+  ::v-deep(.el-table__header ){
+    border-top: 0;
+  }
+  ::v-deep(.el-table ){
+   .warning-row {
+      background: oldlace;
+    }
+  }
+}

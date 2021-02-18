@@ -1,0 +1,85 @@
+.Nav {
+  height: 50px;
+  line-height: 50px;
+  display: flex;
+  background: #0E60DB;
+  position: relative;
+  z-index: 102;
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    width: 15%;
+    min-width: 180px;
+    font-size: 18px;
+    font-family: Microsoft YaHei;
+    font-weight: bold;
+    color: #ffffff;
+    user-select: none;
+    img {
+      max-width: 180px;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    user-select: none;
+  }
+
+  &__item {
+    color: #9FBAE4;
+    padding: 0 20px;
+    cursor: pointer;
+    overflow: hidden;
+
+    &:hover {
+      color: #fff;
+      background: #2A77E9;
+    }
+
+    &_on {
+      color: #fff;
+      background: #2A77E9;
+    }
+  }
+
+  &__user {
+    width: 77px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    &__avatar {
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      color: #0E60DB;
+      text-align: center;
+      font-size: 17px;
+      margin-right: 9px;
+      overflow: hidden;
+    }
+  }
+
+  &__iconList {
+    margin-right: 24px;
+    display: flex;
+
+    .iconfont {
+      cursor: pointer;
+      margin-right: 24px;
+
+      &:hover {
+        opacity: .8;
+      }
+    }
+  }
+
+  .iconfont {
+    font-size: 22px;
+    color: #fff;
+  }
+}

@@ -1,0 +1,75 @@
+
+
+.alarmInfo {
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+
+  &__filter {
+    padding-top: 17px;
+    padding-left: 18px;
+    min-width: 980px;
+
+    &__title {
+      font-size: 12px;
+      font-family: PingFang SC, PingFang SC-Regular;
+      font-weight: 400;
+      text-align: left;
+      color: #333333;
+      margin-right: 8px;
+    }
+
+    &__vehgroup,
+    &__date {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      margin-right: 16px;
+    }
+
+    &__btnBox {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    &__searchbtn {
+      margin-left: 16px;
+    }
+  }
+
+
+  &__table {
+    flex: 1;
+    ::v-deep(.ant-table-thead > tr > th) {
+      color: #333333;
+    }
+
+    ::v-deep(.ant-table-body) {
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background-color: rgba(144, 147, 153, 0.3);
+        transition: background-color 0.3s;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(144, 147, 153, 0.5);
+      }
+      &::-webkit-scrollbar-thumb:active {
+        background-color: rgba(144, 147, 153, 0.5);
+      }
+    }
+  }
+
+  &__pager {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 20px;
+    border-top: 1px solid #d9e0e9;
+  }
+}

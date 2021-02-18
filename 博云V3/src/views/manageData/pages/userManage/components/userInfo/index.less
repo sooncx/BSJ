@@ -1,0 +1,32 @@
+.userInfo {
+  width: 285px;
+  height: 100%;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  &__top{
+    width: 100%;
+    height:203px;
+    border: 1px solid #D9E0E9;
+    padding:19px 0px 22px 16px;
+    .userInfo__list{
+      font-size:14px;
+      color: #333333;
+      font-weight: Regular;
+      margin-bottom: 20px;
+      i{
+        margin-right: 6px;
+      }
+      span{
+        color:#0E60DB;
+      }
+    }
+  }
+  &__tree{
+    flex:1;
+    overflow: auto;
+    background-color: #ffffff;
+    border: 1px solid #D9E0E9;
+    border-top: 0px;
+  }
+}

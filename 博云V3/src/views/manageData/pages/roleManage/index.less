@@ -1,0 +1,42 @@
+.content{
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction:column;
+  .header{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 15px;
+    &__left,&__right{
+      display: flex;
+      flex-wrap: wrap;
+    }
+    &__left button:first-child{
+      margin-left: 0px;
+    }
+    input{
+      width: 200px;
+      margin-right:8px;
+    }
+    button{
+      margin-left: 8px;
+    }
+  }
+  .body{
+    flex:1;
+    display: flex;
+    padding: 10px;
+    flex-direction:column;
+    &__table{
+      flex:1;
+      position: relative;
+    }
+    &__page{
+      padding: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

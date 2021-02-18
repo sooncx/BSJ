@@ -1,0 +1,22 @@
+.manageData {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  &__left {
+    width: 200px;
+    height: 100%;
+    background: #001529;
+  }
+  &__right {
+    height: 100%;
+    flex: 1;
+    background: #F1F3F6;
+    padding-left: 16px;
+    overflow-y: auto;
+  }
+}
+@media screen and (max-width: 980px) {
+  .manageData__left {
+    width: 60px;
+  }
+}

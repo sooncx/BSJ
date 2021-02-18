@@ -1,0 +1,77 @@
+.content{
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction:column;
+  .header{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 15px;
+    &__left,&__right{
+      display: flex;
+      flex-wrap: wrap;
+    }
+    &__left button:first-child{
+      margin-left: 0px;
+    }
+    input{
+      width: 200px;
+      margin-right:8px;
+    }
+    button{
+      margin-left: 8px;
+    }
+  }
+  .body{
+    flex:1;
+    display: flex;
+    flex-direction:column;
+    &__table{
+      flex:1;
+      position: relative;
+      border: 1px solid #e8e8e8;
+      .orderNumber{
+        cursor: pointer;
+        color:#0E60DB;
+      }
+    }
+    &__page{
+      padding: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
+.modelsff {
+  .row{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    input{
+      width: 248px;
+    }
+    .ant-form-item-label > label{
+      color:#333333;
+    }
+    .ant-form-item{
+      justify-content: flex-end;
+    }
+  }
+  .remark { 
+    .ant-form-item{
+      width: 100%;
+    }
+    textarea{
+      width: 600px;
+    }
+  }
+}
+::v-deep(.ant-form-item-label){
+  width: 100px;
+}
+::v-deep(.ant-form-item-label > label){
+  
+  color:#333333;
+}
