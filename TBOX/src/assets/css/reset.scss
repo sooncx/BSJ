@@ -1,0 +1,238 @@
+body,
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 14px;
+  color: #333;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+
+textarea {
+  resize: none;
+  background: #f3f7fb;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+  box-sizing: border-box;
+  padding: 10px;
+  outline: 0;
+  width: 100%;
+  color: #828588;
+  &::placeholder {
+    color: #c5c7d9;
+  }
+}
+
+input::placeholder {
+  color: #c5c7d9;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+  color: #333;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// element reset 开始
+//解决element 表格出现滚动条后表格和表头对不齐的问题
+.el-table th.gutter {
+  display: table-cell !important;
+  width: 17px !important;
+}
+.el-pagination {
+  text-align: right;
+}
+
+.el-table--scrollable-x .el-table__body-wrapper {
+  height: calc(100% - 48px);
+}
+
+.el-input {
+  outline: none;
+}
+
+.el-slider__button {
+  box-sizing: border-box;
+}
+
+// element reset 结束
+
+//infoWindow 开始
+.amap-logo {
+  display: none !important;
+}
+
+.amap-copyright {
+  display: none !important;
+}
+
+.amap-info-contentContainer {
+  box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.1);
+  background: #f8f8f8;
+  box-sizing: border-box;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+  border-radius: 20px;
+  padding: 5px;
+}
+
+.amap-marker-label {
+  border: none;
+  box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 20px;
+  left: 50% !important;
+  transform: translate(-50%, -50px);
+
+  .bsj-infowindow {
+    &::before {
+      background: #fff;
+    }
+  }
+}
+
+.bsj-infowindow {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 3px 10px;
+  font-size: 10px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    display: block;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    left: 50%;
+    z-index: 9;
+    width: 10px;
+    height: 10px;
+    bottom: -10px;
+    background: #fff;
+    z-index: 1;
+  }
+}
+
+//infoWindow 结束
