@@ -201,15 +201,12 @@ export default defineComponent({
       type: Object,
       default: () => {},
     },
-    mapType: {
-      type: String,
-      default: "Amap",
-    },
   },
   setup(props, { emit }) {
     let updateSelectedAllVehs = inject("updateSelectedAllVehs") as Function;
     let updateSelectedVeh = inject("updateSelectedVeh") as Function; // 修改选中车辆
     let timer = null as any;
+    let mapType = inject("mapType") as any;
     const data = reactive({
       options: [
         {
@@ -462,7 +459,7 @@ export default defineComponent({
       },
     });
     watch(
-      () => props.mapType,
+      mapType,
       (val) => {
         // 切换地图关闭追踪
         timer && window.clearInterval(timer);

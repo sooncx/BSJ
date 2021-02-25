@@ -7,7 +7,6 @@
     ref="InfoWindowRef"
     v-model:selectedVeh="selectedVeh"
     v-show="selectedVeh"
-    :mapType="mapType"
     @closeInfoWindow="closeInfoWindow"
     @infoWindowFn="infoWindowFn"
   />
@@ -42,10 +41,6 @@ export default defineComponent({
     Panorama: defineAsyncComponent(() => import("./panorama.vue")),
   },
   props: {
-    mapType: {
-      type: String,
-      default: "",
-    },
     Satellite: {
       type: Boolean,
       default: false,
@@ -82,12 +77,12 @@ export default defineComponent({
     let choseAssociatedVehs = inject("choseAssociatedVehs") as any; // 选中关联车辆
     let updateNowMapRef = inject("updateNowMapRef") as Function; // 地图ref
     let associatedVehs = inject("associatedVehs") as any; // 关联车辆
+    let mapType = inject("mapType") as any;
     let PanoramaShow = ref(false);
     let PanoramaData = ref({}) as any;
     let traceOpen = ref(false);
     let trackVehs = ref([]) as any;
     let {
-      mapType,
       Satellite,
       Traffic,
       centerPoint,
@@ -298,7 +293,7 @@ export default defineComponent({
     //判断是否跳转当前车辆
     function judgeIsZoomMarker(nowVal: any, curVal: any) {
       if (!nowVal) return false;
-      if (props.mapType != "Bmap") return false;
+      if (mapType.value != "Bmap") return false;
       if (!curVal) return true;
       if (nowVal.isAssociate) {
         return true;

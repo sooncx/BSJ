@@ -183,11 +183,28 @@ export function useInit() {
     }
   }
 
+  /**
+   * 
+   * 获取用户设备在线状态
+   */
+  async function getUserVehicleCount() {
+    try {
+      const { obj,flag,msg } = await MDAPI.getUserVehicleCount({});
+      if(flag !== 1){
+        throw msg
+      }
+      store.commit("COMMIT_VEHCOUNT", obj.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async function init(flag?: boolean) {
     await getUser();
     getUserAllData();
     getVehGroupData();
     getListAll();
+    getUserVehicleCount();
     listTerminalResource();
     if (flag) {
       getVehTypes();

@@ -1,6 +1,7 @@
 <template>
   <Drag
     class="monitorCenter"
+    id="monitorCenter"
     v-model:dragResize="dragResize"
   >
     <template v-slot:left>
@@ -10,21 +11,55 @@
           v-model:selectedAllVehs="selectedAllVehs"
           v-model:selectGroupId="selectGroupId"
           v-model:SearchValue="SearchValue"
+          @outPutVideo="outPutVideo"
         />
       </div>
     </template>
     <template v-slot:right>
-      <div
-        class="right"
-        id="DragRight"
-      >
+      <div class="right">
         <Map
+          v-if="!videoFlag"
           v-model:selectedVeh="selectedVeh"
           v-model:selectedAllVehs="selectedAllVehs"
           v-model:dragResize="dragResize"
           v-model:centerPoint="centerPoint"
           v-model:selectGroupId="selectGroupId"
         />
+        <Drag
+          v-else
+          :halfWFlag="false"
+          :minWidth="DragMinWidth"
+          :defaultWidth="DragDefaultWidth"
+          class="monitorCenter"
+          v-model:dragResize="dragResize"
+        >
+          <template v-slot:upside>
+            <ToolBar
+              v-model:selectedVeh="selectedVeh"
+              @toolBarFn="toolBarFn"
+            />
+          </template>
+          <template v-slot:left>
+            <div class="left">
+              <Tachograph
+                v-model:visible="tachographVisible"
+                :vehInfo="tachographData"
+              />
+            </div>
+          </template>
+          <template v-slot:right>
+            <div class="right">
+              <Map
+                ref="MapRef"
+                v-model:selectedVeh="selectedVeh"
+                v-model:selectedAllVehs="selectedAllVehs"
+                v-model:dragResize="dragResize"
+                v-model:centerPoint="centerPoint"
+                v-model:selectGroupId="selectGroupId"
+              />
+            </div>
+          </template>
+        </Drag>
       </div>
     </template>
   </Drag>
@@ -39,6 +74,7 @@ import {
   watch,
   provide,
   inject,
+  computed,
 } from "vue";
 import API from "@/api/vehGroup";
 import { useStore } from "vuex";
@@ -48,17 +84,40 @@ export default defineComponent({
     Drag: defineAsyncComponent(() => import("@/components/Drag/index.vue")),
     Map: defineAsyncComponent(() => import("./map/index.vue")),
     LeftContent: defineAsyncComponent(() => import("./LeftContent/index.vue")),
+    ToolBar: defineAsyncComponent(() => import("./map/ToolBar.vue")),
+    Tachograph: defineAsyncComponent(
+      () => import("@/components/Tachograph/index.vue")
+    ),
   },
   setup(props) {
     const store = useStore();
     const data = reactive({
       centerPoint: [114.410658, 33.113539],
       mapZoom: 10,
+      MapRef: ref<HTMLDivElement | null>(null),
       selectGroupId: new Set(),
       dragResize: false,
       selectedVeh: null, // 当前选中车辆
       selectedAllVehs: new Map(), // 当前已选所有车辆
       SearchValue: null,
+    });
+    // 功能弹窗ref
+    const NowMapRef = computed(() => {
+      if (!data.MapRef) return;
+      return data.MapRef as any;
+    });
+    //
+    const DragMinWidth = computed(() => {
+      const dom = document.getElementsByClassName("drag__right")[0];
+      if (dom) {
+        return 400;
+      }
+    });
+    const DragDefaultWidth = computed(() => {
+      const dom = document.getElementsByClassName("drag__right")[0];
+      if (dom) {
+        return [dom.clientWidth * 0.7, "px"].join("");
+      }
     });
     const updateVehGroupData = inject("updateVehGroupData") as Function;
     // 轮询秒数
@@ -69,13 +128,41 @@ export default defineComponent({
     };
     provide("updateCycleCecond", updateCycleCecond);
 
+    // 行车记录仪
+    let tachograph = ref(null) as any;
+    provide("tachograph", tachograph);
+    const updateTachograph = (val: object) => {
+      tachograph.value = val;
+      console.log(tachograph.value);
+    };
+    provide("updateTachograph", updateTachograph);
+
+    // 视频显示
+    const videoFlag = ref(false);
+    provide("videoFlag", videoFlag);
+
+    // 视频数量
+    const videoNum = ref(1);
+    provide("videoNum", videoNum);
+    provide("updateVideoNum", (val: number) => {
+      videoNum.value = val;
+    });
+
     // 地图类型
-    let mapType_type = ref("Amap") as any;
-    provide("mapType_type", mapType_type);
-    const updateMapType = (val: number) => {
-      mapType_type.value = val;
+    let mapType = ref("Bmap") as any;
+    provide("mapType", mapType);
+    const updateMapType = (val: string) => {
+      mapType.value = val;
     };
     provide("updateMapType", updateMapType);
+
+    // 地图侧边栏显示标识
+    let slideBoxShow = ref(false) as any;
+    provide("slideBoxShow", slideBoxShow);
+    const updateSlideBoxShow = (val: boolean) => {
+      slideBoxShow.value = val;
+    };
+    provide("updateSlideBoxShow", updateSlideBoxShow);
 
     // 聚合切换
     let Cluster = ref(true); // 聚合开关
@@ -162,8 +249,32 @@ export default defineComponent({
     //     console.log(error);
     //   }
     // }
+    async function toolBarFn(type: string, flag = false) {
+      NowMapRef && NowMapRef.value.toolBarFn(type, flag);
+    }
+    const tachographVisible = ref(false);
+    const tachographData = ref(null);
+    function outPutVideo(val: { name: string; vehInfo: any }) {
+      if (val.name === "行车记录仪") {
+        tachographVisible.value = true;
+        tachographData.value = val.vehInfo;
+      }
+    }
+    watch(tachograph, (val: { name: string; vehInfo: any }) => {
+      if (val.name === "行车记录仪") {
+        tachographVisible.value = true;
+        tachographData.value = val.vehInfo;
+      }
+    });
     return {
       ...toRefs(data),
+      toolBarFn,
+      videoFlag,
+      outPutVideo,
+      tachographVisible,
+      tachographData,
+      DragMinWidth,
+      DragDefaultWidth,
     };
   },
 });

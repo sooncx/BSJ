@@ -29,14 +29,17 @@
             v-permission="150901"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="150902"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="150902"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -67,6 +70,7 @@ export default defineComponent({
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
   },
   setup() {
     const loading = ref(false);
@@ -124,46 +128,55 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "下发用户",
         align: "center",
         key: "userName",
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "plate",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "terminalNo",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "groupName",
+        visible: true
       },
       {
         title: "下发类型",
         align: "center",
         key: "commandId",
+        visible: true
       },
       {
         title: "下发内容",
         align: "center",
         key: "commandMsg",
+        visible: true
       },
       {
         title: "下发时间",
         align: "center",
         key: "createTime",
+        visible: true
       },
       {
         title: "下发结果",
         align: "center",
         key: "result",
+        visible: true
       },
     ]);
 

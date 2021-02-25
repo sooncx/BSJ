@@ -1,5 +1,5 @@
 <template>
-  <div class="tree">
+  <div class="tree"  v-loading="treeLoading">
     <div class="header" v-if="searchTitle !== ''">
       <!-- 用户名搜索 -->
       <UserSearch 
@@ -19,13 +19,12 @@
     </div>
     <div class="body">
       <Tree
-        v-loading="treeLoading"
         :expanded-keys="expandedKeys"
         :replace-fields="replaceFields"
         :auto-expand-parent="autoExpandParent"
         :tree-data="treeData"
         :checkable="checkable"
-        v-model:checkedKeys="select"
+        v-model:checkedKeys="checkedKeys"
         defaultExpandAll
         :checkStrictly="checkStrictly"
         :selectedKeys="selectedKeys"
@@ -37,12 +36,7 @@
               <i v-if="title === 'corpName'" class="iconfont icon icon-me"></i>
               <i v-if="title === 'gn' && item.children" class="iconfont icon icon-chezu-1"></i>
               <i v-if="title === 'gn' && item.children === undefined" class="iconfont icon icon-che-"></i>
-              <span v-if="item[title].indexOf(searchValue) > -1">
-                {{ item[title].substr(0, item[title].indexOf(searchValue)) }}
-                <span style="color: #f50">{{ searchValue }}</span>
-                {{ item[title].substr(item[title].indexOf(searchValue) + searchValue.length) }}
-              </span>
-              <span v-else>{{ item[title] }}</span>
+              <span >{{ item[title] }}</span>
               <span :class="['settingIcon',`${clickSelectKey === item['eventKey'] ? 'active': ''}`]" v-if="setting">
                 <div v-for="(iconItem,iconKey) in iconList" :key="iconKey" >
                 <i
@@ -74,18 +68,22 @@ export default defineComponent({
     UserSearch
   },
   props: {
+    // 树 指定key
     replaceFields: {
       type: Object,
       default : {}
     },
+    // 是否可选
     checkable: {
       type: Boolean,
       default: false
     },
+    // 树 数据
     treeDataArray: {
       type: Array as PropType<any>,
       default: []
     },
+    // 父级数据
     parentKey: {
       type: Object,
       default: {
@@ -93,28 +91,32 @@ export default defineComponent({
         parentId: '',
       }
     },
+    // 搜索 筛选数据
     tagList: {
       type: Array,
-      default: [
-        0,1,2,3,4
-      ]
+      default: [0, 1, 2, 3, 4]
     },
+    // 树节点 显示key
     title: {
       type: String,
       default: ''
     },
+    // 是否显示 功能
     setting: {
       type: Boolean,
       default: true
     },
+    // 搜索默认title
     searchTitle: {
       type: String,
       default: ''
     },
+    // 默认选中数据
     selectedCheckedKeys:{
       type: Array as PropType<any>,
       default: []
     },
+    // checkable 状态下节点选择完全受控
     checkStrictly: {
       type: Boolean,
       default: false
@@ -122,46 +124,24 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const data = reactive({
-      iconList: [
-        {
-          type: 'add',
-          icon: 'icon-zengjia',
-          id: 0,
-        },
-        {
-          type: 'edit',
-          icon: 'icon-xiugai',
-          id: 0,
-        },
-        {
-          type: 'delete',
-          icon: 'icon-shanchu1',
-          id: 0,
-        },
-        {
-          type: 'editInfo',
-          icon: 'icon-jiache',
-          id: 0,
-        },
+      iconList: [                                             // 功能图片数组
+        { type: 'add', icon: 'icon-zengjia', id: 0 },
+        { type: 'edit', icon: 'icon-xiugai', id: 0 },
+        { type: 'delete', icon: 'icon-shanchu1', id: 0 },
+        { type: 'editInfo', icon: 'icon-jiache', id: 0 },
       ],
-      expandedKeys: <any>[],
-      selectedKeys: <any>[],
-      autoExpandParent: true,
-      userInfo: null,
-      searchValue: '',
-      clickSelectKey:<any>-1,
-      fuzzyValue: <any>{},
-      treeData: <any>[],
-      select: <any>[],
+      expandedKeys: <any>[],                                  // 默认展开
+      selectedKeys: <any>[],                                  // 选中数据
+      autoExpandParent: true,                                 // 是否自动展开父节点
+      userInfo: null,                                         // 用户树 搜索
+      clickSelectKey:<any>-1,                                 // 监听通过搜索选中节点
+      fuzzyValue: <any>{},                                    // 车组树 搜索
+      treeData: <any>[],                                      // 树数据
+      checkedKeys: <any>[],                                   // 选中复选框的树节点
       treeLoading: false,
-      inputStyle:{
-        width: '100%',height:'32px',
-      }
+      inputStyle:{ width: '100%',height:'32px' }              // 搜索框默认数据
     });
-    let parentTreeData = <any>[];
-    let dataList = <any>[];
     const store = useStore();
-
     //权限检查 用户树
     if(props.title === 'corpName'){
       data.iconList[0].id = 160102;
@@ -179,8 +159,17 @@ export default defineComponent({
       data.iconList = data.iconList.filter((item:any)=> item.type !== 'delete');
     }
 
+    // 监听选中默认值
     watch(()=>props.selectedCheckedKeys,(value)=>{
-      data.select = value;
+      data.checkedKeys = value;
+      setTimeout(()=>{
+        // 滚动到选中值
+        let jumpRow = document.getElementsByClassName('ant-tree-treenode-checkbox-checked')[0];
+        if(!jumpRow){
+          jumpRow = document.getElementsByClassName('ant-tree-treenode-checkbox-indeterminate')[0];
+        }
+        jumpRow && jumpRow.scrollIntoView();
+      },500);
     });
     
     // 选择用户注入器
@@ -188,26 +177,26 @@ export default defineComponent({
     const selectUserId = (userId:any) => {
       updateSelectUserId(userId);
     }
-    // 选择用户/车组ID
+    // 选择用户ID/车组ID 并滚动树节点
     const selectInfoId = (id:any) => {
       data.expandedKeys = [id];
       data.selectedKeys = [id];
       setTimeout(()=>{
+        // 滚动到选中值
         const jumpRow = document.getElementsByClassName('ant-tree-node-selected')[0];
         jumpRow && jumpRow.scrollIntoView();
       },500);
     }
 
-    
     // 监听用户搜索
-    watch(()=>data.userInfo,(userId:any)=>{
-      if(!userId){
+    watch(()=>data.userInfo,(value:any)=>{
+      if(!value){
         data.selectedKeys = [];
         data.expandedKeys.push(store.state.USER.userId);
         return false;
       }
-      selectUserId(userId);
-      selectInfoId(userId);
+      selectUserId(value);
+      selectInfoId(value);
     });
     // 监听路由路径
     watch(() => router.currentRoute.value.name,(val, old: any) => {
@@ -235,42 +224,41 @@ export default defineComponent({
       }
     });
     
-    watch(()=>props.treeDataArray,(value)=>{
-      nextTick(()=>{
+    
+    nextTick(()=>{
+      watch(()=>props.treeDataArray,(value)=>{
+        data.treeData = [];
         if(!value) return;
-        if(value.length === 0){
-          data.treeData = [];
-          return;
-        };
+        if(value.length === 0) return;
         data.treeLoading = true;
-        parentTreeData = toTreeData(value,props.parentKey);
-        data.treeData = parentTreeData;
-        dataList = value;
-        //默认打开第一列
+        data.treeData = toTreeData(value,props.parentKey);
+        // 默认打开第一列
         data.expandedKeys = [data.treeData[0][props.parentKey.id]]
         data.treeLoading = false;
-      });
-    },{ immediate: true });
+      },{ immediate: true, deep: true });
+    });
     // 树节点展开/收缩
     const onExpand = (expandedKeys: any[]) =>{
       data.expandedKeys = expandedKeys;
       data.autoExpandParent = false;
     }
+
+    // 树节点功能
     const emitType = (type:string,item:any) => {
       if(item.gi) data.selectedKeys = [item.gi];
       if(item.userId) data.selectedKeys = [item.userId];
       data.clickSelectKey = item.eventKey;
+      if(item.userId) selectUserId(item.userId);
       emit('type',type,item);
     }
+    // 功能节点显示判断
     const getIconShow = (item: any,type:any='') => {
       // 用户树
       if(props.title === 'corpName'){
         // 顶级父类不显示任何 操作
-        if(item.userId === store.state.USER.userId){
-          return false;
-        }
+        if(item.userId === store.state.USER.userId) return false;
         // 用户类型 为 监控用户 不显示 添加和绑车操作
-        if(item.accountType && item.accountType === 4 && (type === 'add' || type === 'editInfo')){
+        if(store.state.USER.accountType === 4 && (type === 'add' || type === 'editInfo')){
           return false;
         }
         return true;
@@ -291,7 +279,10 @@ export default defineComponent({
         return true;
       }
     }
+
+    // 点击复选框触发
     const onCheck = (item:any,e:any) => {
+      console.log(item);
       let selectData = <any>[];
       e.checkedNodes.forEach((i:any)=>{
         selectData.push({
@@ -303,6 +294,7 @@ export default defineComponent({
       emit("oncheck", selectData);
     }
 
+    // 选中树节点
     const seleceTree = (item:any) => {
       data.clickSelectKey = item.eventKey;
       if(props.title === 'gn' && item.pi === 0) return;
@@ -316,6 +308,7 @@ export default defineComponent({
       emit('selectTree',item);
     }
 
+    // 返回iconTitle
     const getModalTitle = (type:string) => {
       switch(type){
         case 'add':
@@ -376,6 +369,7 @@ export default defineComponent({
   }
   .settingIcon{
     display: none;
+    width: 90px;
     margin-left:7px;
     div{
       display: inline-block;

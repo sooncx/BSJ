@@ -56,14 +56,17 @@
             v-permission="150201"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="150202"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="150202"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -86,6 +89,7 @@ export default defineComponent({
   name: "offine",
   components: {
     BasicTemplate,
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
@@ -163,47 +167,56 @@ export default defineComponent({
         width: 60,
         slots: { customRender: "index" },
         key: "index",
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "P",
+        visible: true
       },
       {
         title: "SIM卡号",
         align: "center",
         key: "M",
+        visible: true
       },
       {
         title: "终端编号",
         align: "center",
         key: "N",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "G",
+        visible: true
       },
       {
         title: "车辆类型",
         align: "center",
         key: "Y",
+        visible: true
       },
       {
         title: "最后在线时间",
         align: "center",
         key: "T",
+        visible: true
       },
       {
         title: "离线时间",
         align: "center",
         key: "S",
+        visible: true
       },
       {
         title: "位置",
         align: "center",
         key: "address",
         minwidth: 240,
+        visible: true
       },
     ]);
 

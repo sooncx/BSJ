@@ -1,12 +1,11 @@
 <template>
   <div class="Map">
     <ToolBar
-      v-model:mapType="mapType"
+      v-if="!videoFlag"
       v-model:selectedVeh="selectedVeh"
-      v-model:slideBoxShow="slideBoxShow"
       @toolBarFn="toolBarFn"
     />
-    <SlideBox v-model:slideBoxShow="slideBoxShow">
+    <SlideBox>
       <Point
         v-if="slideBoxType == '二押点'"
         v-model:pointData="slideBoxData"
@@ -26,7 +25,6 @@
       :centerPoint="$attrs.centerPoint"
       :selectedAllVehs="$attrs.selectedAllVehs"
       :selectedVeh="selectedVeh"
-      v-model:mapType="mapType"
       :Satellite="Satellite"
       :Traffic="Traffic"
       @popFn="popFn"
@@ -37,7 +35,6 @@
       :centerPoint="$attrs.centerPoint"
       :selectedAllVehs="$attrs.selectedAllVehs"
       :selectedVeh="selectedVeh"
-      v-model:mapType="mapType"
       :Satellite="Satellite"
       :Traffic="Traffic"
       @popFn="popFn"
@@ -54,7 +51,6 @@
       />
     </TableBox>
     <FenceDialog
-      v-model:mapType="mapType"
       v-model:visible="fenceDialogVisible"
       v-model:vehInfo="fenceDialogVehInfo"
       v-model:fenceData="fenceDialogData"
@@ -82,7 +78,7 @@
     >
       <template v-slot:content>
         <el-cascader-panel
-          :props="{expandTrigger:'hover'}"
+          :props="{ expandTrigger: 'hover' }"
           :options="options"
           @change="selectChange"
         ></el-cascader-panel>
@@ -111,9 +107,12 @@
     <OcarDialog v-model:visible="OcarVisible" />
     <div
       class="cycleBox"
+      :style="{
+        top: videoFlag ? '5px' : '65px',
+      }"
       v-if="selectGroupId.size > 0"
     >
-      <p>{{cycleCecond}}</p>
+      <p>{{ cycleCecond }}</p>
       <span>秒后刷新</span>
     </div>
   </div>
@@ -131,6 +130,7 @@ import {
   computed,
   provide,
   inject,
+  Ref,
 } from "vue";
 import { useFunction } from "../function";
 import { GetGeo } from "@/api/apiFn";
@@ -179,35 +179,37 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    let mapType = inject("mapType") as any;
+    let slideBoxShow = inject("slideBoxShow") as any; // 围栏/位置点/二押点侧边栏visible
+    let updateSlideBoxShow = inject("updateSlideBoxShow") as Function;
+    const videoFlag = <Ref<boolean>>inject("videoFlag");
     const data = reactive({
-      OcarVisible: false,
-      tableResize: false,
-      showOptions: false,
-      cycleTimer: null as any,
-      fenceType: "addFence",
+      OcarVisible: false, // ocar出入库弹窗visible
+      tableResize: false, // 地图右下角报警表格缩放事件标识
+      showOptions: false, // 地图右下角报警表格选项栏是否展示
+      cycleTimer: null as any, // 循环定时器
+      fenceType: "addFence", // 添加围栏/停留点/位置点等弹窗的默认类型
       Satellite: false, // 卫星图层
       Traffic: false, // 路况图层
-      mapType: "Amap", // 地图类型
-      popoverList: [],
-      slideBoxData: [],
-      popoverVisible: false,
-      popMouseEvent: {},
-      areaVehDialogData: {},
-      areaVehDialogVisible: false,
-      CloudTwoChargeVisible: false,
-      TwoChargeBindVehVisible: false,
-      attentionList: ["高", "中", "低", "修改备注", "清除关注"],
-      popType: "",
-      DialogType: "",
-      menuType: "",
-      slideBoxShow: false,
-      slideBoxType: "",
-      toolBarType: "",
-      fenceDialogVisible: false,
-      fenceDialogVehInfo: null as any,
-      fenceDialogData: null as any,
-      areaDialogVisible: false,
-      areaDialogTitle: "",
+      popoverList: [], // 指令列表
+      popoverVisible: false, // 指令列表visible
+      slideBoxData: [], // 围栏/位置点/二押点侧边栏数据
+      popMouseEvent: {}, // 地图信息窗口选项点击位置,用于设置指令列表展示位置
+      areaVehDialogData: {}, // 区域查车数据
+      areaVehDialogVisible: false, // 区域查车visible
+      CloudTwoChargeVisible: false, // 云端二押点visible
+      TwoChargeBindVehVisible: false, // 二押点绑车弹窗visible
+      attentionList: ["高", "中", "低", "修改备注", "清除关注"], // 关注度列表
+      popType: "", // 指令列表类型
+      DialogType: "", // 区域选项弹窗类型
+      menuType: "", // 地图信息窗口选项类型
+      slideBoxType: "", // 围栏/位置点/二押点侧边栏类型
+      toolBarType: "", // 地图顶部工具栏类型
+      fenceDialogVisible: false, // 地图添加围栏/停留点/位置点等弹窗的visible
+      fenceDialogVehInfo: null as any, // 地图添加围栏/停留点/位置点等弹窗的当前点击车辆信息
+      fenceDialogData: null as any, // 地图添加围栏/停留点/位置点等弹窗的当前点击车辆关联的地图信息
+      areaDialogVisible: false, // 区域功能弹窗visible
+      areaDialogTitle: "", // 区域功能弹窗标题
       Bmap: ref<HTMLDivElement | null>(null),
       Amap: ref<HTMLDivElement | null>(null),
       OptionsMene: ref<HTMLDivElement | null>(null),
@@ -278,25 +280,20 @@ export default defineComponent({
     });
     const {
       showMsg,
-      normalShowMsg,
       showAMsg,
-      getPathIdByVehicleId,
       SelectPointByUserId,
       labelDetailFn,
-      DeletePoint,
       getArea,
       GetVehicleCircle,
       saveRoundFence,
-      updateRoundFence,
       deleteRoundFence,
       GetVehicleStayPoint,
       deleteStoppingPoint,
       GetTwoChargeByUserId,
-      saveVehicleConcern,
-      deleteVehicleConcern,
     } = useFunction();
-    let cycleCecond = inject("cycleCecond") as any;
-    let updateCycleCecond = inject("updateCycleCecond") as Function;
+    let cycleCecond = inject("cycleCecond") as any; // 循环秒数
+    let updateCycleCecond = inject("updateCycleCecond") as Function; // 更新循环秒数
+    let tachograph = inject("tachograph") as any; // 行车记录仪指令点击标识
     // 位置点，围栏，二押点侧边面板事件
     const slideBoxFn = async (type: string, val = null as any) => {
       data.fenceDialogVehInfo = null;
@@ -310,7 +307,7 @@ export default defineComponent({
             : nowMapRef.value.clearAllPoints();
           break;
         case "关闭位置点面板":
-          data.slideBoxShow = false;
+          updateSlideBoxShow(false);
           nowMapRef.value.clearAllPoints();
           break;
         case "添加位置点":
@@ -335,7 +332,7 @@ export default defineComponent({
             : nowMapRef.value.clearAllFences();
           break;
         case "关闭围栏面板":
-          data.slideBoxShow = false;
+          updateSlideBoxShow(false);
           nowMapRef.value.clearAllFences();
           break;
         case "删除围栏成功":
@@ -358,7 +355,7 @@ export default defineComponent({
           nowMapRef.value.zoomOverlay(val, "二押点");
           break;
         case "关闭二押点面板":
-          data.slideBoxShow = false;
+          updateSlideBoxShow(false);
           nowMapRef.value.clearAllTwoChargePoints();
           break;
         case "添加二押点":
@@ -393,13 +390,17 @@ export default defineComponent({
     async function FenceOkFn(type: string, showInMap = true) {
       switch (type) {
         case "添加位置点成功":
-          if (showInMap && data.slideBoxShow && data.slideBoxType == "位置点") {
+          if (
+            showInMap &&
+            slideBoxShow.value &&
+            data.slideBoxType == "位置点"
+          ) {
             data.slideBoxData = await SelectPointByUserId();
             nowMapRef.value.drawAllPoints(data.slideBoxData as any);
           }
           break;
         case "添加围栏成功":
-          if (showInMap && data.slideBoxShow && data.slideBoxType == "围栏") {
+          if (showInMap && slideBoxShow.value && data.slideBoxType == "围栏") {
             data.slideBoxData = await getArea();
             nowMapRef.value.drawAllFences(data.slideBoxData as any);
           }
@@ -411,7 +412,11 @@ export default defineComponent({
         case "围栏绑车成功":
           break;
         case "添加二押点成功":
-          if (showInMap && data.slideBoxShow && data.slideBoxType == "二押点") {
+          if (
+            showInMap &&
+            slideBoxShow.value &&
+            data.slideBoxType == "二押点"
+          ) {
             data.slideBoxData = await GetTwoChargeByUserId();
             // nowMapRef.value.drawTwoChargePoints(data.slideBoxData as any);
           }
@@ -439,7 +444,7 @@ export default defineComponent({
       }
     };
     provide("MapFn", MapFn);
-    // 信息窗区域选项的弹窗的按钮事件
+    // 信息窗区域选项的弹窗的按钮确定事件
     const dialogFn = async (flag: boolean, val = null) => {
       if (flag) {
         switch (data.DialogType) {
@@ -507,7 +512,7 @@ export default defineComponent({
             data.slideBoxData = [];
             data.slideBoxType = type;
             setTimeout(async () => {
-              if (data.slideBoxShow) {
+              if (slideBoxShow.value) {
                 data.slideBoxData = await getArea();
                 nowMapRef.value.drawAllFences(data.slideBoxData as any);
               } else {
@@ -519,7 +524,7 @@ export default defineComponent({
             data.slideBoxData = [];
             data.slideBoxType = type;
             setTimeout(async () => {
-              if (data.slideBoxShow) {
+              if (slideBoxShow.value) {
                 data.slideBoxData = await GetTwoChargeByUserId();
                 // nowMapRef.value.drawTwoChargePoints(data.slideBoxData as any);
               } else {
@@ -544,7 +549,7 @@ export default defineComponent({
             data.slideBoxData = [];
             data.slideBoxType = type;
             setTimeout(async () => {
-              if (data.slideBoxShow) {
+              if (slideBoxShow.value) {
                 data.slideBoxData = await SelectPointByUserId();
                 nowMapRef.value.drawAllPoints(data.slideBoxData as any);
               } else {
@@ -576,7 +581,7 @@ export default defineComponent({
         updateCycleCecond(second);
       }, 1000);
     }
-    // 信息窗口功能弹窗显示/隐藏事件
+    //  地图信息窗口功能弹窗显示/隐藏事件
     function popFn(event: any, item: any) {
       data.menuType = "";
       data.popType = item.label;
@@ -603,7 +608,7 @@ export default defineComponent({
         data.popMouseEvent = { clientX, clientY };
       }
     }
-    // 区域弹窗事件
+    // 地图信息窗口车辆区域相关事件
     async function selectChange(val: any[]) {
       data.popoverVisible = false;
       data.DialogType = val[val.length - 1];
@@ -666,7 +671,7 @@ export default defineComponent({
           if (!stayPointRes) {
             showMsg("无停留点!");
             return;
-          };
+          }
           const arr = stayPointRes.split(";");
           if (arr.length == 0) return;
           let home: any = {
@@ -723,18 +728,15 @@ export default defineComponent({
       }
     }
     // 监听侧边栏状态，关闭后清除相关覆盖物
-    watch(
-      () => data.slideBoxShow,
-      (val) => {
-        nextTick(() => {
-          if (!val) {
-            nowMapRef.value && nowMapRef.value.clearAllPoints(); // 清除位置点
-            nowMapRef.value && nowMapRef.value.clearAllFences(); // 清除围栏
-            nowMapRef.value && nowMapRef.value.clearAllTwoChargePoints(); // 清除二押点
-          }
-        });
-      }
-    );
+    watch(slideBoxShow, (val) => {
+      nextTick(() => {
+        if (!val) {
+          nowMapRef.value && nowMapRef.value.clearAllPoints(); // 清除位置点
+          nowMapRef.value && nowMapRef.value.clearAllFences(); // 清除围栏
+          nowMapRef.value && nowMapRef.value.clearAllTwoChargePoints(); // 清除二押点
+        }
+      });
+    });
     // 用于ant ui 联级面板功能
     // watch(
     //   () => data.menuType,
@@ -783,6 +785,8 @@ export default defineComponent({
       popFn,
       FenceOkFn,
       cycleCecond,
+      mapType,
+      videoFlag,
       ...toRefs(data),
       ...toRefs(props),
     };

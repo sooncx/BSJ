@@ -162,11 +162,19 @@ const beforeUrl = {
   getOBDVehicleInfo: "/car/v1/api/monitor/getOBDVehicleInfo", // OBD数据
   getVehicleDateByPlate: "/car/v1/api/vehicle/getVehicleDateByPlate.json", // 车辆资料关联数据
 
+  // 视频直播
+  realVideoReq: "/car/v1/video/cmd/realVideoReq.json", // 实时视频请求
+  realControlReq: "/car/v1/video/cmd/realControlReq.json", // 实时视频控制请求
+  replayReq: "/car/v1/video/cmd/replayReq.json", // 录像回放请求
+  replayControlReq: "/car/v1/video/cmd/replayControlReq.json", // 录像回放控制请求
+  replayResourceReq: "/car/v1/video/cmd/replayResourceReq.json", // 资源目录请求
+  queryResourceResponse: "/car/v1/video/cmd/queryResourceResponse.json", // 查询资源列表结果
+
   // 资料管理
   pageSettleList: '/car/v1/api/settle/pageSettleList', // 结清车辆列表
   getUserVehicleCount: '/car/v1/api/renew/getUserVehicleCount.json', // 获取当前用户设备数量
   pageVehicleExpire: '/car/v1/api/renew/pageVehicleExpire.json', // 车辆续费列表
-  carRechargeDownLoadDoc: '/muban/车辆续费文档.docx', // 下载文档
+  carRechargeDownLoadDoc: 'https://bycl.oss-cn-shenzhen.aliyuncs.com/%E8%BD%A6%E8%BE%86%E7%BB%AD%E8%B4%B9%E6%93%8D%E4%BD%9C%E6%96%87%E6%A1%A3.docx', // 下载文档
   vehicleStateRecharge: '/car/v1/api/renew/vehicleStateRecharge.json', // 单辆车续费接口
   exportVehicleExpire: '/car/v1/api/renew/exportVehicleExpire.json', // 导出车辆续费数据
   exportSettleList: '/car/v1/api/settle/exportSettleList', //结清列表导出
@@ -221,7 +229,6 @@ const beforeUrl = {
   addRole: "/car/v1/api/role/add.json", // 新增角色
   resourceTree: "/car/v1/api/resource/tree.json", // 树形查询用户拥有的资源
   exportVehicleByGroupRds: "/car/v1/api/vehicle/exportVehicleByGroupRds.json", // 导出车组下所有车辆
-
   getImportVehicleData: '/car/v1/api/importVehicle/getImportVehicleData.json', //获取中间表的错误数据
   delImportVehicleData: '/car/v1/api/importVehicle/delImportVehicleData.json', //删除中间标的所有数据
   updateErrorImportVehicle: '/car/v1/api/importVehicle/updateErrorImportVehicle.json', //批量修改错误信息

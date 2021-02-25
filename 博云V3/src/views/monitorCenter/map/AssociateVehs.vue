@@ -45,7 +45,7 @@
         @mouseenter="showDetail($event, item)"
         @mouseleave="hideDetail()"
       >
-        <i class="iconfont icon-car"></i>
+        <i class="iconfont icon-car1"></i>
         {{
           item.P + "(" + getVehState(item.Z, item.d, item.timeInterval) + ")"
         }}
@@ -191,6 +191,7 @@ export default defineComponent({
             break;
         }
       },
+      // 鼠标移入
       showDetail(e: any, veh: any) {
         data.choseVeh = veh;
         data.detailList = [
@@ -242,6 +243,7 @@ export default defineComponent({
         dom && (dom.style.left = clientX + 20 + "px");
         dom && (dom.style.bottom = screenH - clientY + "px");
       },
+      // 鼠标移出
       hideDetail() {
         data.choseVeh = null;
         const dom = document.getElementsByClassName(
@@ -252,7 +254,7 @@ export default defineComponent({
     });
     watch(
       associatedVehs as any,
-      (val) => {
+      (val, old: any) => {
         if (val && val[0]) {
           data.carType = val[0].carType == 0 ? "车牌" : "车架号";
         }
@@ -270,6 +272,7 @@ export default defineComponent({
         });
         const dom = document.getElementsByClassName("associate")[0] as any;
         if (val && val.length > 0) {
+          if (old && old.length > 0) return;
           dom && (dom.style.bottom = 0);
           data.showList = true;
         } else {

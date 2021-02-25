@@ -101,7 +101,7 @@
         <a-dropdown>
           <template #overlay>
             <a-menu @click="handleMenuClick">
-              <a-menu-item :key="2.5" va>慢</a-menu-item>
+              <a-menu-item :key="2.5">慢</a-menu-item>
               <a-menu-item :key="5">中</a-menu-item>
               <a-menu-item :key="7.5">快</a-menu-item>
               <a-menu-item :key="15">飚</a-menu-item>
@@ -244,7 +244,7 @@ export default defineComponent({
       form.value.startTime = dayJs(new Date().getTime() - duriation).format(
         "YYYY-MM-DD 00:00:00"
       );
-      form.value.endTime = dayJs(new Date().getTime() - duriation).format(
+      form.value.endTime = dayJs(new Date().getTime()).format(
         "YYYY-MM-DD 23:59:59"
       );
     };
@@ -280,7 +280,9 @@ export default defineComponent({
     const tableExpand = <any>inject("tableExpand");
     const playFlag = ref(false);
     const play = () => {
-      if (state.playIndex === playbackTotal.value) return;
+      if (state.playIndex === playbackTotal.value) {
+        state.playIndex = 0;
+      };
       playFlag.value = !playFlag.value;
       if (playFlag.value) {
         mapControl.value.play();

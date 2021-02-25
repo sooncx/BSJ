@@ -75,32 +75,153 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,toRefs,nextTick,ref } from "vue";
+import { defineComponent,toRefs,nextTick,ref,reactive } from "vue";
 import { installWorkerModal } from "@/views/manageData/module/index";
 import SelectDate from "@/views/manageData/module/src/SelectDate.vue";
+import API from "@/api/manageData";
+import { Modal  } from 'ant-design-vue';
+import { ElMessage } from 'element-plus';
 import router from "@/router";
-import { 
-  data,
-  currentChange,
-  handleSelectionChange,
-  showData,
-  onSearch,
-  getData,
-  installWorkerHandOk,
-  deleteData
-} from "./index";
 export default defineComponent({
   components: {
     installWorkerModal,
     SelectDate
   },
   setup() {
-    const tableBox:any = ref(null);
-    const offsetHeight = ref();
+    const data = reactive({
+      search:{ 
+        name: '',                             // 搜索安装人员名字
+        pageSize: 0, 
+        pageNumber: 0,
+        startTime: '',                        // 开始时间
+        endTime: '',                          // 结束时间
+      },
+      rangeDate: [],                          // 日期选择值
+      tableData : <any>[],                    // 表格数据
+      pagination :{                           // 分页配置
+        showTotal: (total:string) => `共 ${total} 条数据`,  // 显示总数
+        showSizeChanger: true,                // 是否允许选中 指定数量
+        pageSize: 40,                         // 分页数量
+        total: 0,
+        current:1,
+        pageSizeOptions: ['40','60','80','100'], //指定数量
+      },
+      modalVisible: false,                    // 窗口显示状态
+      modalType: '',                          // 窗口显示类型 新增或修改
+      modalItem: null,                        // 窗口默认内容
+      tableSelectsData: <any>[],              // 表格多选值
+      tableLoading: false,                    // 表格Loding
+      tableBox: <any>null,
+      offsetHeight: <any>null,
+    });
+
+    // 获取数据
+    const getData = async () => {
+      data.tableLoading = true;
+      data.tableData = [];
+      try {
+        data.search.pageSize = data.pagination.pageSize;
+        data.search.pageNumber = data.pagination.current;
+        data.search.startTime = data.rangeDate[0];
+        data.search.endTime = data.rangeDate[1];
+        const { obj,flag,msg } = await API.pageInstallWorkerListByCondition(data.search);
+        if(flag !== 1) throw msg;
+        data.pagination.total = obj.total;
+        data.tableData = obj.data;
+      } catch (error) {
+        ElMessage.error(error);
+      }
+      data.tableLoading = false;
+    }
+
+    // 搜索功能
+    const onSearch = () => {
+      data.pagination.current = 1;
+      getData();
+    }
+
+    // 窗口回调成功
+    const installWorkerHandOk = () => {
+      ElMessage.success('添加/修改成功');
+      getData();
+    }
+
+    // 分页功能
+    const currentChange = (page: number, pageSize: number) => {
+      data.pagination.current = page;
+      data.pagination.pageSize = pageSize;
+      getData();
+    };
+
+    // 表格多选
+    const handleSelectionChange = (item:Array<Object>) => {
+      data.tableSelectsData = item;
+    }
+
+    // 删除数据
+    const deleteData = (record:any) => {
+      // 判断是否选择表格数据
+      if(record === null && data.tableSelectsData.length === 0){
+        ElMessage.error('请在表格中选择需要删除的安装人员');
+        return false;
+      }
+      Modal.confirm({
+        title: '删除人员',
+        content: '是否删除该安装人员（该操作不可逆）？',
+        okText: '确定',
+        cancelText: '取消',
+        onOk() {
+          if(record === null){
+            deleteInstallWorkers();         // 批量删除
+          }else{
+            deleteInstallWorker(record);    // 单个删除
+          }
+          setTimeout(()=>{
+            getData()
+          },500);
+        }
+      });
+    }
+    // 批量删除功能
+    const deleteInstallWorkers = async () => {
+      let userIds = '';
+      data.tableSelectsData.forEach((item:any)=>{
+        userIds += item.userId + ','
+      });
+      try {
+        const { flag,msg } = await API.deleteInstallWorkers({userIds:userIds.substring(0,userIds.length-1)});
+        if(flag !== 1) throw msg;
+        ElMessage.success('删除成功');
+        getData();
+      } catch (error) {
+        ElMessage.error(error);
+      }
+    }
+
+    // 单独删除功能
+    const deleteInstallWorker = async (item:any) => {
+      try {
+        const { flag,msg } = await API.deleteInstallWorker({userId:item.userId});
+        if(flag !== 1) throw msg;
+        ElMessage.success('删除成功');
+        getData();
+      } catch (error) {
+        ElMessage.error(error);
+      }
+    }
+
+    // 显示
+    const showData = (record:any, type:string) => {
+      data.modalVisible = true,
+      data.modalType = type;
+      data.modalItem = record;
+    }
+
     nextTick(() => {
       getData();
-      offsetHeight.value = tableBox.value.offsetHeight;  // 减去表头高度
+      data.offsetHeight = data.tableBox.offsetHeight;
     });
+
     // 跳转到工单页面
     const goWorkSheet = (type:string,item:any) => {
       router.push({
@@ -114,8 +235,6 @@ export default defineComponent({
     }
     return {
       goWorkSheet,
-      tableBox,
-      offsetHeight,
       showData,
       onSearch,
       deleteData,
@@ -129,5 +248,50 @@ export default defineComponent({
 </script>
 <style lang="less" scoped>
 @import "../../../dataReport/module/css/index";
-@import "./index.less";
+.content{
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction:column;
+  .header{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 15px;
+    &__left,&__right{
+      display: flex;
+      flex-wrap: wrap;
+    }
+    &__left button:first-child{
+      margin-left: 0px;
+    }
+    input{
+      width: 200px;
+      margin-right:8px;
+    }
+    button{
+      margin-left: 8px;
+    }
+  }
+  .body{
+    flex:1;
+    display: flex;
+    flex-direction:column;
+    &__table{
+      flex:1;
+      position: relative;
+      border: 1px solid #e8e8e8;
+      .orderNumber{
+        cursor: pointer;
+        color:#0E60DB;
+      }
+    }
+    &__page{
+      padding: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
 </style>

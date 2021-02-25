@@ -706,6 +706,7 @@ export function useAmap(mapRef: Ref<HTMLDivElement>, centerPoint = [114.410658, 
     // 绘制关联车辆点
     async function dwawAssociateMarker(list: any[]) {
         AssociateMarkers && AssociateMarkers.length > 0 && map && map.remove(AssociateMarkers);
+        AssociateMarkers = [];
         if (list.length == 0) return;
         list.map((item: any) => {
             if (item.X && item.Y) {

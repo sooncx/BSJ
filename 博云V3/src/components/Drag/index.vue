@@ -4,40 +4,50 @@
     class="drag"
     :style="{cursor: isDrag ? 'e-resize' : 'auto', pointerEvents: isDrag ? 'none' : 'auto'}"
   >
-    <!-- 上部分开始 -->
     <div
-      class="drag__left"
-      ref="leftContent"
+      class="dragupside"
+      v-if="$slots.upside"
     >
-      <slot name="left"></slot>
+      <slot name="upside"></slot>
     </div>
-    <!-- 上部分结束 -->
 
-    <!-- 下部分开始 -->
-    <div
-      class="drag__right"
-      ref="rightContent"
-    >
-      <!-- 拖拽框开始 -->
+    <div class="drag__content">
+      <!-- 上部分开始 -->
       <div
-        class="drag__bar"
-        :class="{drag__bar_on: isDrag}"
-        @mousedown.left="handleMousedown"
+        class="drag__left"
+        ref="leftContent"
       >
-        <div class="drag__bar-con">
-          <i
-            class="drag__trigger-bar"
-            v-for="(item, index) in new Array(8)"
-            :key="index"
-          ></i>
+        <slot name="left"></slot>
+      </div>
+      <!-- 上部分结束 -->
+
+      <!-- 下部分开始 -->
+      <div
+        class="drag__right"
+        ref="rightContent"
+      >
+        <!-- 拖拽框开始 -->
+        <div
+          class="drag__bar"
+          :class="{drag__bar_on: isDrag}"
+          @mousedown.left="handleMousedown"
+        >
+          <div class="drag__bar-con">
+            <i
+              class="drag__trigger-bar"
+              v-for="(item, index) in new Array(8)"
+              :key="index"
+            ></i>
+          </div>
+        </div>
+        <!-- 拖拽框结束 -->
+        <div class="drag__content">
+          <slot name="right"></slot>
         </div>
       </div>
-      <!-- 拖拽框结束 -->
-      <div class="drag__content">
-        <slot name="right"></slot>
-      </div>
+      <!-- 下部分结束 -->
     </div>
-    <!-- 下部分结束 -->
+
   </div>
 </template>
 <script lang="ts">
@@ -55,6 +65,10 @@ export default defineComponent({
     dragResize: {
       type: Boolean,
       default: false,
+    },
+    halfWFlag: {
+      type: Boolean,
+      default: true,
     },
   },
   setup(props, { emit }) {
@@ -77,7 +91,7 @@ export default defineComponent({
       changeW < minWidth.value && (changeW = minWidth.value);
       //大于容器一半宽度则设为容器一半宽度
       const halfW = (options.drag as any).clientWidth / 2;
-      changeW > halfW && (changeW = halfW);
+      props.halfWFlag && changeW > halfW && (changeW = halfW);
       (options.leftContent as any).style.width = changeW + "px";
     }
     function handleMouseUp(e: HTMLDivElement | any) {
@@ -108,12 +122,22 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
+.dragupside {
+  height: 46px;
+  width: 100%;
+  position: relative;
+}
 .drag {
   display: flex;
   height: 100%;
+  flex-direction: column;
   // &__left {
   //   min-width: 200px;
   // }
+  &__content {
+    display: flex;
+    flex: 1;
+  }
   &__right {
     flex: 1;
     display: flex;

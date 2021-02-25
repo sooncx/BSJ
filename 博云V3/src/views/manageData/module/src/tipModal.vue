@@ -6,7 +6,7 @@
 <script lang="ts">
 import { defineComponent} from "vue";
 export default defineComponent({
-  name: "tipModal",
+  name: "tipModal",     // 统一弹窗头部的标题
   props: {
     title: {
       type: String,

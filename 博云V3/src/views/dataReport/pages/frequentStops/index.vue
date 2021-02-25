@@ -35,10 +35,13 @@
             v-permission="150501"
             >搜索</a-button
           >
-          <a-button type="primary" v-permission="150504" @click="debounceOnExpoert">
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button type="primary" v-permission="150504" @click="debounceOnExpoert">
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -105,6 +108,7 @@ export default defineComponent({
     Detail: defineAsyncComponent(() => import("./Detail.vue")),
     AMap: defineAsyncComponent(() => import("./AMap.vue")),
     BMap: defineAsyncComponent(() => import("./BMap.vue")),
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
   },
   setup() {
     const loading = ref(false);
@@ -184,25 +188,29 @@ export default defineComponent({
         title: "车组名称",
         align: "center",
         key: "groupName",
-        minwidth: 150
+        minwidth: 150,
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "plate",
-        minwidth: 150
+        minwidth: 150,
+        visible: true
       },
       {
         title: "位置",
         align: "center",
         key: "address",
-        minwidth: 360
+        minwidth: 360,
+        visible: true
       },
       {
         title: "停车次数",
         align: "center",
         key: "n",
-        width: 90
+        width: 90,
+        visible: true
       },
       {
         title: "停车详情",
@@ -210,6 +218,7 @@ export default defineComponent({
         key: "operation",
         width: 120,
         slots: { customRender: "operation" },
+        visible: true
       },
     ]);
 

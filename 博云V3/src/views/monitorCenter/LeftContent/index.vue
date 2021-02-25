@@ -22,6 +22,7 @@ export default defineComponent({
     Tree: defineAsyncComponent(() => import("./TreeList.vue")),
   },
   props: {},
+  emits: ["outPutVideo"],
   setup(props, { emit }) {
     const data = reactive({});
     return {

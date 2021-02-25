@@ -30,10 +30,13 @@
             v-permission="150601"
             >搜索</a-button
           >
-          <a-button type="primary" @click="onExport" v-permission="150602">
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button type="primary" @click="onExport" v-permission="150602">
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -47,7 +50,7 @@
   </BasicTemplate>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, toRefs } from "vue";
+import { defineComponent, ref, reactive, toRefs, defineAsyncComponent } from "vue";
 import { BasicTemplate } from "../../module";
 import API from "@/api/dataReport/";
 import APIType from "@/api/dataReport/type";
@@ -58,6 +61,7 @@ export default defineComponent({
   name: "remainderElectric",
   components: {
     BasicTemplate,
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
   },
   setup() {
     const loading = ref(false);
@@ -101,36 +105,43 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "P",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "G",
+        visible: true
       },
       {
         title: "车主",
         align: "center",
         key: "W",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "N",
+        visible: true
       },
       {
         title: "剩余电量(%)",
         align: "center",
         key: "E",
+        visible: true
       },
       {
         title: "SIM卡号",
         align: "center",
         key: "I",
+        visible: true
       },
     ]);
 

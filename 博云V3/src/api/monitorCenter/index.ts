@@ -256,4 +256,28 @@ export default {
     * 车辆资料关联数据
     */
    getVehicleDateByPlate: (params: any): Promise<any> => GET(url.getVehicleDateByPlate, params),
+   /**
+    * 车辆资料关联数据
+    */
+   realVideoReq: (params: any): Promise<any> => POSTBody(url.realVideoReq, params),
+   /**
+    * 车辆资料关联数据
+    */
+   realControlReq: (params: any): Promise<any> => POSTBody(url.realControlReq, params),
+   /**
+    * 录像回放请求
+    */
+   replayReq: (params: any): Promise<any> => POSTBody(url.replayReq, params),
+   /**
+    * 录像回放控制请求
+    */
+   replayControlReq: (params: any): Promise<any> => POSTBody(url.replayControlReq, params),
+   /**
+    * 资源目录请求
+    */
+   replayResourceReq: (params: any): Promise<any> => POSTBody(url.replayResourceReq, params),
+   /**
+    * 查询资源列表结果
+    */
+   queryResourceResponse: (params: any): Promise<any> => POSTBody(url.queryResourceResponse, params),
 }

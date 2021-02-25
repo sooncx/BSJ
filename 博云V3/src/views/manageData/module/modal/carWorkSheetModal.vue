@@ -91,7 +91,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,reactive, ref,toRefs,watch,computed,PropType, nextTick} from "vue";
+import { defineComponent,reactive, toRefs,watch,computed,PropType} from "vue";
 import { VehGroupSelect } from "@/components/VehGroup/index";
 import { ElMessage } from "element-plus";
 import API from "@/api/manageData";
@@ -138,34 +138,38 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const data = reactive({
-      carWorkSheetConfirmLoading: false,
-      devNo: '',
-      tableData: <any>[],
-      title: '新建工单',
-      form: {
-        carOwner: '',
-        phone: '',
-        installWorker:  null,
-        installTime: '',
-        vehicleFlag: 1,
-        id: 0,
-        devices: '',
-        address: '',
-        remark: '',
-      },
-      rules: {
+      carWorkSheetConfirmLoading: false,                    // 提交loading
+      title: '新建工单',                                     // 窗口loading
+      form: <any>null,                                      // FORM表单
+      rules: {                                              // 验证规则
         installWorker: [{ type:'number', required: true, message: '请选择安装人员', trigger: 'change' }],
         remark: [{ required: true, message: '请备注设备信息（设备名称，设备号）',  trigger: 'blur' }],
         address: [{ required: true, message: '请输入安装地址',  trigger: 'blur' }],
         phone: [{ type:'string', required: true, message: '请输入正确的手机号',  trigger: 'blur' }],
         installTime: [{ type:'date', required: true, message: '请选择安装时间', trigger: 'change' }]
       },
-      workSheetDeviceVo: null,
-      deviceList: <any>[],
-      formDisabled:false,
-      installWorkerList: <any>[],
-      ruleForm: null as any
+      workSheetDeviceVo: null,                              // 选择设备    
+      deviceList: <any>[],                                  // 安装设备列表
+      formDisabled:false,                                   // 是否禁用
+      installWorkerList: <any>[],                           // 安装人员
+      ruleForm: null as any                                 // 验证REF
     });
+
+    // 初始化表单数据
+    const initForm = () => {
+      data.form = {
+        carOwner: '',                                       // 车主姓名
+        phone: '',                                          // 联系电话
+        installWorker:  null,                               // 安装人员
+        installTime: '',                                    // 预安装时间
+        vehicleFlag: 1,                                     // 是否安装设备
+        id: 0,                                              // 工单ID
+        devices: '',                                        // 设备列表ID
+        address: '',                                        // 安装地址
+        remark: '',                                         // 备注信息
+      };
+    }
+    initForm();
 
     const show = computed({
       get: () => props.visible,
@@ -178,6 +182,9 @@ export default defineComponent({
       if(!value) return;
       data.title = props.type === 'add' ? '新建工单' : props.type==='edit'? '修改工单' : '查看工单';
       data.deviceList = [];
+      data.formDisabled = false;
+      // 初始化表单数据
+      initForm();
       if(props.type !== 'add'){
         data.form.id = props.dataItem.id;
         data.form.carOwner = props.dataItem.carOwner;
@@ -187,6 +194,7 @@ export default defineComponent({
         data.form.installWorker = props.dataItem.installWorker;
         data.form.installTime = props.dataItem.installTime;
         data.form.vehicleFlag = props.dataItem.vehicleFlag;
+        // 判断是否有安装设备列表
         if(props.dataItem.workSheetDeviceVo !== undefined &&  props.dataItem.workSheetDeviceVo.length !== 0){
           props.dataItem.workSheetDeviceVo.forEach((item:any) => {
             data.deviceList.push({
@@ -195,39 +203,26 @@ export default defineComponent({
             });
           });
         }
-      }else{
-        data.form.carOwner = '';
-        data.form.address = '';
-        data.form.id = 0;
-        data.form.remark = '';
-        data.form.devices = '';
-        data.form.phone = '';
-        data.form.installWorker =  null;
-        data.form.installTime = '';
-        data.form.vehicleFlag = 1;
-        data.deviceList = [];
       }
-      if(props.type === 'show'){
-        data.formDisabled = true;
-      }else{
-        data.formDisabled = false;
-      }
+      // 判断查看类型  不能编辑
+      if(props.type === 'show') data.formDisabled = true;
+      // 获取安装人员列表
       getInstallWorker();
     });
 
     //提交功能
     const handleOk =  () =>{
-      // data.carWorkSheetConfirmLoading = true;
+      data.carWorkSheetConfirmLoading = true;
+      // 判断是查看 则关闭窗口
       if(props.type === 'show'){
-        emit("update:visible", false);
-        return;
+        emit("update:visible", false); return;
       }
       data.ruleForm.validate().then(async () => {
         data.form.devices = '';
         //判断是否有选择安装设备
         if(data.form.vehicleFlag  === 0){
           if(data.deviceList.length === 0){
-            ElMessage.error("请选择安装设备");return;
+            ElMessage.error("请选择安装设备"); return;
           }
           data.deviceList.forEach((item:any)=>{
             data.form.devices += item.vehicleId + ','
@@ -235,17 +230,14 @@ export default defineComponent({
         }
 
         try{
+          // 判断 是否添加类型
           if(props.type === 'add'){
             const { msg,flag } = await API.saveWorkSheet(data.form);
-            if(flag !== 1){
-              throw msg;
-            }
+            if(flag !== 1) throw msg;
             ElMessage.success('添加成功');
           }else{
             const { msg,flag } = await API.updateWorkSheet(data.form);
-             if(flag !== 1){
-              throw msg;
-            }
+            if(flag !== 1) throw msg;
             ElMessage.success('更新成功');
           }
           emit('workSheetHandOk',props.type);
@@ -254,7 +246,7 @@ export default defineComponent({
           ElMessage.error(error);
         }
       });
-
+      data.carWorkSheetConfirmLoading = false;
     }
 
     //返回功能
@@ -267,48 +259,40 @@ export default defineComponent({
       try {
         data.installWorkerList = [];
         const { obj,flag,msg } = await API.pageInstallWorker();
-        if(flag !== 1){
-          throw msg;
-        }
-        obj.forEach((item:any)=>{
-          if(item.flag == 1){
-            data.installWorkerList.push(item);
-          }
-        });
+        if(flag !== 1) throw msg;
+        // 过滤离职人员
+        data.installWorkerList = obj.filter((item)=>{ return item.flag === 1 });
       } catch (error) {
         ElMessage.error(error);
       }
     }
 
-    //判断选择车组组件是否可用
+    //判断选择车组 组件是否可用
     const getVehGroupSelectDisabled = computed(() => {
-      if(data.formDisabled === true){
-        return true;
-      }
-      if(data.form.vehicleFlag === 1){
-        data.deviceList = [];
-      }
+      if(data.formDisabled === true) return true;
+      // 判断  是否安装设备  否 清空安装设备 
+      if(data.form.vehicleFlag === 1) data.deviceList = [];
       data.workSheetDeviceVo = null;
       return data.form.vehicleFlag == 0 ? false : true
     });
 
     //删除安装设备
     const closeDeviceList = (index:number) => {
+      // 查看功能 无法删除
       if(props.type === 'show') return;
       data.deviceList.splice(index,1);
     }
 
+    // 监听选择车辆
     watch(()=>data.workSheetDeviceVo,(value:any)=>{
       if(!value) return;
       // 判断车辆是否过期
       if(value.EP !== undefined){
         ElMessage.error("设备已过期");return;
       }
-      // 判断当前车辆或设备是否存在
+      // 判断当前选择车辆或设备是否已经存在
       const checkDev = data.deviceList.find((item:any)=>{
-        if(item.vehicleId === value.vehicleId){
-          return true;
-        }
+        if(item.vehicleId === value.vehicleId) return true;
       });
       if(checkDev === undefined){
         data.deviceList.push({
@@ -317,7 +301,8 @@ export default defineComponent({
         });
       }
     });
-
+    
+    // 日期格式化
     const installTimeBlur = () => {
       data.form.installTime = dayJs(data.form.installTime).format('YYYY-MM-DD HH:mm:ss');
     }

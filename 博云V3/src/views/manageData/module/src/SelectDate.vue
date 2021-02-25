@@ -41,24 +41,25 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, PropType, reactive,toRefs } from "vue";
-import dayJs from "dayjs";
 import moment from "moment";
 import { ElMessage } from 'element-plus';
 export default defineComponent({
   name: "selectDay",
   props: {
+    // 显示类型
     dateType: {
       type: String as PropType<"date" | "day" | "all" | "dayCustom">,
       default: "range",
+    },
+    // 默认日期
+    interval: {
+      type: Number as PropType<number>,
+      default: 31
     },
     value: {
       type: Array as PropType<any>,
       default: [],
     },
-    interval: {
-      type: Number as PropType<number>,
-      default: 31
-    }
   },
   setup(props, { emit }) {
     const data = reactive({
@@ -66,22 +67,10 @@ export default defineComponent({
       customDay: <number | string>'',
     });
     const datelist = ref([
-      {
-        name: "昨天",
-        interval: 1,
-      },
-      {
-        name: "近三天",
-        interval: 3,
-      },
-      {
-        name: "近七天",
-        interval: 7,
-      },
-      {
-        name: "近一月",
-        interval: 31,
-      }
+      { name: "昨天", interval: 1 },
+      { name: "近三天", interval: 3 },
+      { name: "近七天", interval: 7 },
+      { name: "近一月", interval: 31 }
     ]);
 
     if(props.dateType === 'dayCustom'){
@@ -90,25 +79,20 @@ export default defineComponent({
         interval: 0
       });
     }
-
+    
+    // 默认开始时间
     const defaultStartTime = ref({
       defaultValue: moment("00:00:00", "HH:mm:ss")
     });
 
+    // 默认结束时间
     const defaultEndTime = ref({
       defaultValue: moment("23:59:59", "HH:mm:ss")
     });
 
     const day = ref(props.interval);
 
-    const onClick = (interval: number) => {
-      emit("update:value", [
-        dayJs(new Date().getTime() - 3600 * 1000 * 24 * interval).format(
-          "YYYY-MM-DD 00:00:00"
-        ),
-        dayJs(new Date().getTime()).format("YYYY-MM-DD 23:59:59"),
-      ]);
-    };
+    // 选中天数
     const onInterVal = (interval: number) => {
       day.value = interval;
       if(interval === 0){
@@ -118,6 +102,7 @@ export default defineComponent({
       emit("selectDay",interval);
     }
     
+    // 自定义天数提交
     const handleOk = () => {
       if(!data.customDay){
         ElMessage.error('请输入天数'); return;
@@ -135,7 +120,6 @@ export default defineComponent({
       defaultStartTime,
       datelist,
       day,
-      onClick,
       onInterVal,
       ...toRefs(data)
     };

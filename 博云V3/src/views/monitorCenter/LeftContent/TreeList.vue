@@ -118,26 +118,28 @@ export default defineComponent({
   setup(props, { emit }) {
     const store = useStore();
     const data = reactive({
-      command: null,
+      command: null, // 指令
       loading: false,
       OtherDialogVisible: false,
-      groupInfo: null,
-      DialogType: "",
-      DialogTitle: "",
-      menuVisible: false,
-      tree: null as any,
-      expendkey: [],
-      expendList: [] as any,
-      rightClickVal: [] as any,
-      selectedKeys: new Set(),
+      groupInfo: null, // 车组信息
+      DialogType: "", // 鼠标右键弹窗类型
+      DialogTitle: "", // 鼠标右键弹窗标题
+      menuVisible: false, // 鼠标右键选项卡visible
+      tree: null as any, // 树ref
+      expendkey: [], // 展开车组id集合
+      expendList: [] as any, // 展开车组id集合
+      rightClickVal: [] as any, // 鼠标右键点击节点数据
+      selectedKeys: new Set(), // 已选的车组id集合
       defaultProps: {
         children: "children",
         label: "gn",
       },
+      // 判断是否选中所有车组
       isChoseAllTreeNode: function () {
         if (!store.state.allGroupList) return false;
         return store.state.allGroupList.length == data.selectedKeys.size;
       },
+      // 全选/取消全选车组
       allTreeNodeFn: function () {
         // if (data.isChoseAllTreeNode()) {
         //   data.selectedKeys = new Set();
@@ -151,6 +153,7 @@ export default defineComponent({
           emit("update:selectGroupId", data.selectedKeys);
         }, 100);
       },
+      // 树右键事件
       rightClick: (MouseEvent: any, object: any) => {
         if ([-1, -2].includes(object.gi)) return;
         // 阻止浏览器默认右键事件
@@ -175,6 +178,7 @@ export default defineComponent({
           return true;
         };
       },
+      // 树右键点击选项卡事件
       rightClickFn: (type: string) => {
         data.OtherDialogVisible = true;
         data.DialogType = type;
@@ -199,6 +203,7 @@ export default defineComponent({
         }
       },
     });
+    // 树点击事件
     function handleNodeClick(e: any) {
       if (data.selectedKeys.has(e.gi)) {
         data.selectedKeys.delete(e.gi);

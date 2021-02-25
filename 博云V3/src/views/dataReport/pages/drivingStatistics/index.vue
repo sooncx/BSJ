@@ -37,14 +37,17 @@
             v-permission="150301"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="150303"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="150303"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -85,6 +88,7 @@ export default defineComponent({
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     Detail: defineAsyncComponent(
       () => import("../../module/src/DetailModal.vue")
     ),
@@ -148,36 +152,43 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "plate",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "terminalNo",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "groupName",
+        visible: true
       },
       {
         title: "开始时间",
         align: "center",
         key: "beginTime",
+        visible: true
       },
       {
         title: "结束时间",
         align: "center",
         key: "endTime",
+        visible: true
       },
       {
         title: "持续时间",
         align: "center",
         key: "accSpaceTime",
+        visible: true
       },
       {
         title: "操作",
@@ -185,6 +196,7 @@ export default defineComponent({
         key: "operation",
         width: 60,
         slots: { customRender: "operation" },
+        visible: true
       },
     ]);
 

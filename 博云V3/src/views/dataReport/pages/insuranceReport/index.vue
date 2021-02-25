@@ -28,10 +28,13 @@
             class="filter__searchbtn"
             >搜索</a-button
           >
-          <a-button type="primary" @click="debounceOnExpoert">
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button type="primary" @click="debounceOnExpoert">
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -62,6 +65,7 @@ export default defineComponent({
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
   },
   setup() {
     const loading = ref(false);
@@ -117,67 +121,80 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "plate",
+        visible: true
       },
       {
         title: "客户姓名",
         align: "center",
         key: "owner",
+        visible: true
       },
       {
         title: "客户电话",
         align: "center",
         key: "phone",
+        visible: true
       },
       {
         title: "是否首保",
         align: "center",
         key: "type",
         slots: { customRender: "isFirst" },
+        visible: true
       },
       {
         title: "总金额",
         align: "center",
         key: "amountMoney",
+        visible: true
       },
       {
         title: "保险公司",
         align: "center",
         key: "insuranceCompany",
+        visible: true
       },
       {
         title: "险种明细",
         align: "center",
         key: "insuranceType",
+        visible: true
       },
       {
         title: "提前多少天提醒",
         align: "center",
         key: "leadTime",
+        visible: true
       },
       {
         title: "登记日期",
         align: "center",
         key: "loginTime",
+        visible: true
       },
       {
         title: "下一次续保的时间",
         align: "center",
         key: "nestTimeInsuranceTime",
+        visible: true
       },
       {
         title: "提示内容",
         align: "center",
         key: "tips",
+        visible: true
       },
       {
         title: "备注",
         align: "center",
         key: "remark",
+        visible: true
       },
     ]);
 

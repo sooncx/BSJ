@@ -43,7 +43,7 @@ import { ElMessage } from "element-plus";
 import API from "@/api/manageData";
 interface installWorker {
   name: string,
-  phone: number | string,
+  phone: string,
   username: string,
   password: string,
   remark: string,
@@ -52,117 +52,100 @@ interface installWorker {
 export default defineComponent({
   name: "installWorkerModal",
   props: {
+    // 安装人员数据
     dataItem: {
       type: [Object] as PropType<installWorker>,
       default : {
-        userId: 0,
-        name: '',
-        phone: '',
-        username: '',
-        password: '',
-        remark: '',
+        userId: 0,                // 安装人员ID
+        name: '',                 // 名字
+        phone: '',                // 电话号码
+        username: '',             // 登录账户
+        password: '',             // 登录密码
+        remark: '',               // 备注
       }
     },
+    // 窗口类型 添加/修改
     type: {
       type: String,
       default : ''
     },
+    // 显示状态
     visible: {
       type: Boolean,
       default: false,
     },
   },
   setup(props, { emit }) {
-    
-
+    // 用户名验证规则
     let validateUserName = async (rule:any, value:any, callback:any) => {
       const userNameRegex = /^[a-zA-Z][a-zA-Z0-9_]{2,11}$/;
-      if(value === ''){
-        return Promise.reject('长度3-12位,首字母英文+英文字母和数字');
-      }
-      if(userNameRegex.test(value)){
-        return Promise.resolve();
-      }else{
-        return Promise.reject('长度3-12位,首字母英文+英文字母和数字');
-      }
+      if(value === '') return Promise.reject('长度3-12位,首字母英文+英文字母和数字');
+      if(userNameRegex.test(value)) return Promise.resolve();
+      return Promise.reject('长度3-12位,首字母英文+英文字母和数字');
+      
     };
+    // 密码验证规则
     let validatePassword = async (rule:any, value:any, callback:any) => {
       const regex = /^[a-zA-Z0-9_]{6,12}$/;
-      if(value === ''){
-        return Promise.reject('长度6-12位，英文字母+数字');
-      }
-      if(regex.test(value)){
-        return Promise.resolve();
-      }else{
-        return Promise.reject('长度6-12位，英文字母+数字');
-      }
+      if(value === '') return Promise.reject('长度6-12位，英文字母+数字');
+      if(regex.test(value)) return Promise.resolve();
+      return Promise.reject('长度6-12位，英文字母+数字');
     }
+    // 电话号码验证规则
     let validatePhone = async (rule:any, value:any, callback:any) => {
       const regex = /^(\\+?0?86\\-?)?1[3456789]\d{9}$/;
-      if(value === ''){
-        return Promise.reject('目前只支持中国大陆的手机号码');
-      }
-      if(regex.test(value)){
-        return Promise.resolve();
-      }else{
-        return Promise.reject('目前只支持中国大陆的手机号码');
-      }
+      if(value === '') return Promise.reject('目前只支持中国大陆的手机号码');
+      if(regex.test(value)) return Promise.resolve();
+      return Promise.reject('目前只支持中国大陆的手机号码');
     }
 
 
     const data = reactive({
       modalLoading: false,
-      title: '',
+      title: '',                                    // 窗口标题
       form: {
         userId: <number | undefined>0,
         name: '',
-        phone: <any>'',
+        phone: '',
         username: '',
         password: '',
         remark: '',
       },
-      ruleForm: null as any,
+      ruleForm: null as any,                        // 验证表单FORM
       rules: {
         name: [
           { required: true, message: '请输入人员姓名',  trigger: 'blur' },
           { min: 2, message: '姓名2~4个字符', trigger: 'change' },
         ],
-        phone: [
-          { required: true,validator: validatePhone, trigger: 'change' },
-        ],
-        username: [
-          { required: true,validator: validateUserName, trigger: 'change' },
-        ],
-        password: [
-          { required: true,validator: validatePassword, trigger: 'change' },
-        ],
+        phone: [{ required: true,validator: validatePhone, trigger: 'change' }],
+        username: [{ required: true,validator: validateUserName, trigger: 'change' }],
+        password: [{ required: true,validator: validatePassword, trigger: 'change' },],
       },
     });
 
+    // 提交数据
     const handleOk = () =>{
-       data.ruleForm.validate().then(async () => {
-         try{
+      data.modalLoading = true;
+      data.ruleForm.validate().then(async () => {
+        try{
           let code = 3;
           let error = '';
+          // 判断是否添加
           if(props.type === 'add'){
             const { msg,flag } = await API.saveInstallWorker(data.form);
-            code = flag;
-            error = msg;
+            code = flag; error = msg;
           }else{
             const { msg,flag } = await API.updateInstallWorker(data.form);
-            code = flag;
-            error = msg;
+            code = flag; error = msg;
           }
-          if(code === 1){
-            emit('installWorkerHandOk',props.type);
-            emit("update:visible", false);
-          }else{
-            ElMessage.error(error);
-          }
+          if(code !== 1) throw error;
+          emit('installWorkerHandOk',props.type);
+          emit("update:visible", false);
         }catch(e){
           ElMessage.error(e.msg);
         }
-       });
+      });
+      data.modalLoading = false;
     }
     const handleback = () => {
       emit("update:visible", false);
@@ -176,8 +159,13 @@ export default defineComponent({
     });
 
     watch(()=>props.visible,(value)=>{
-      if(!props.visible) return;
+      if(!value) return;
       data.title = props.type === 'add'? '新建人员' : '修改人员' ;
+      data.form.name = '';
+      data.form.phone = '';
+      data.form.username = '';
+      data.form.password = '';
+      data.form.remark = '';
       if(props.type !== 'add'){
         data.form.userId = props.dataItem.userId;
         data.form.name = props.dataItem.name;
@@ -185,12 +173,6 @@ export default defineComponent({
         data.form.username = props.dataItem.username;
         data.form.password = props.dataItem.password;
         data.form.remark = props.dataItem.remark;
-      }else{
-        data.form.name = '';
-        data.form.phone = '';
-        data.form.username = '';
-        data.form.password = '';
-        data.form.remark = '';
       }
     });
     return {

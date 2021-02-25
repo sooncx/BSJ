@@ -18,32 +18,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,reactive, computed,toRefs,ref, PropType,watch,} from "vue";
+import { defineComponent,reactive, computed,toRefs,watch,} from "vue";
 import { tipModal } from "@/views/manageData/module/index";
 import API from "@/api/manageData";
 import { ElMessage } from 'element-plus';
-interface DayAndPrice {
-  day:number,
-  price:number,
-}
 export default defineComponent({
   name: "carDeleteCustomModal",
   components:{
     tipModal
   },
   props: {
-    dataItem: {
-      type: Object as PropType<any>,
-      default: () => ({
-      }),
-    },
+    // 显示状态
     visible: {
       type: Boolean,
       default: false,
     },
   },
   setup(props, { emit }) {
-    const dataRea = reactive({
+    const data = reactive({
       modalLoading: false,
       remark: '',
     });
@@ -57,23 +49,26 @@ export default defineComponent({
       () => props.visible,
       async (val) => {
         if (!val) return;
-        dataRea.remark = '';
+        data.remark = '';
       }
     );
+    // 提交数据
     const handleOk = async () => {
+      data.modalLoading = true;
       try{
-        if(dataRea.remark === '') throw '请输入设备号！！';
-        dataRea.remark = dataRea.remark.replace(/\r\n/g,",").replace(/\n/g,",")
-        const { obj,flag,msg } = await API.batchDelVehicle({terminalNos:dataRea.remark});
-        if(flag !== 1){
-          throw msg
-        }
+        if(data.remark === '') throw '请输入设备号！！';
+        // 将回车替换成逗号
+        data.remark = data.remark.replace(/\r\n/g,",").replace(/\n/g,",")
+        const { obj,flag,msg } = await API.batchDelVehicle({terminalNos:data.remark});
+        if(flag !== 1) throw msg;
         emit('carDeleteCustomModalHandleOK',obj.data);
         emit("update:visible", false);
       }catch(error){
         ElMessage.error(error);
       }
+      data.modalLoading = false;
     }
+    // 返回数据
     const handleBack = () => {
       emit("update:visible", false);
     }
@@ -81,7 +76,7 @@ export default defineComponent({
       show,
       handleOk,
       handleBack,
-      ...toRefs(dataRea),
+      ...toRefs(data),
     };
   },
 });

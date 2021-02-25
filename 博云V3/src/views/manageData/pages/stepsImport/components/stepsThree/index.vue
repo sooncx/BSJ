@@ -21,12 +21,8 @@
       </div>
     </div>
     <div class="action">
-      <a-button @click="back">
-        上一步
-      </a-button>
-      <a-button type="primary" @click="carRechargeShow">
-        下一步
-      </a-button>
+      <a-button @click="back">上一步</a-button>
+      <a-button type="primary" @click="carRechargeShow">下一步</a-button>
     </div>
     <carRechargeModal 
     v-bind="$attrs" 
@@ -52,6 +48,7 @@ export default defineComponent({
     carRechargeModal
   },
   props:{
+    // 上传返回数据集
     uploadData: {
       type: Object as PropType<any>,
       default: {
@@ -61,23 +58,24 @@ export default defineComponent({
   },
   setup(props, {emit}) {
     const data = reactive({
-      tableData : <any>[],      //表格数据
-      successNum: 0,
-      columns,                  // 表格头部
+      tableData : <any>[],                              // 表格数据
+      successNum: 0,                                    // 成功数量
+      columns,                                          // 表格头部
       VehGroup: <any>{
-          gi:''
+        gi:''
       },    
-      pagination :{             // 分页配置
+      pagination :{                                     // 分页配置
         showTotal: (total:string) => `共 ${total} 条数据`,  // 显示总数
-        pageSize: 10,           // 分页数量
+        pageSize: 10,                                   // 分页数量
         total: 0,
         current:1,
       },
-      carRechargeModelVisible: false,
+      carRechargeModelVisible: false,                   // 续费窗口显示状态
       selectTableItem: <any>[],
       visible: true
     }); 
 
+    // 显示续费窗口
     const carRechargeShow = () => {
       //判断是否选择车组了
       if(data.VehGroup === null){
@@ -86,16 +84,16 @@ export default defineComponent({
       }
       data.carRechargeModelVisible = true;
     }
-    const next = () => {
-      emit('next');
-    }
+    // 返回
     const back = () => {
       emit('back');
     }
+    // 监听上传成功返回数据集变化
     watch(()=>props.uploadData,(value:any)=>{
       data.tableData = value.data.rightData;
       data.successNum = value.data.rightNum;
     });
+    // 续费窗口 返回选择月份
     const importGetmonth = async (item:any) => {
       const info = {
         groupId:data.VehGroup.gi,
@@ -103,9 +101,7 @@ export default defineComponent({
       }
       try {
         const { msg,flag } = await API.insertBatchVeh(info);
-        if(flag !== 1){
-          throw msg
-        }
+        if(flag !== 1) throw msg;
         emit('next');
         emit("submitSuccess",{
           groupName:data.VehGroup.gn,
@@ -119,7 +115,6 @@ export default defineComponent({
     return {
       importGetmonth,
       carRechargeShow,
-      next,
       back,
       ...toRefs(data)
     };

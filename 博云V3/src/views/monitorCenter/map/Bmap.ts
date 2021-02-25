@@ -651,7 +651,8 @@ export function useBmap(mapRef: Ref<HTMLDivElement>, centerPoint = [114.410658, 
     async function dwawAssociateMarker(list: any[]) {
         AssociateMarkers.length > 0 && AssociateMarkers.map((item: any) => {
             map && map && map.removeOverlay(item);
-        })
+        });
+        AssociateMarkers = [];
         if (list.length == 0) return;
         list.map((item: any) => {
             if (item.X && item.Y) {

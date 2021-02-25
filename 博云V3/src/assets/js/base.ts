@@ -6,6 +6,53 @@ export const debounce: Function = (function () {
         timer = setTimeout(callback, ms);
     };
 })();
+// 是否全屏
+export function isFullscreenFn() {
+    let res = (document as any).fullscreen ||
+        (document as any).msFullscreenElement ||
+        (document as any).mozFullScreen ||
+        (document as any).webkitIsFullScreen || false;
+    return res;
+}
+// 退出全屏
+export function ExitFullscreen() {
+    //W3C
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+    //FireFox
+    else if ((document as any).mozCancelFullScreen) {
+        (document as any).mozCancelFullScreen();
+    }
+    //Chrome等
+    else if ((document as any).webkitCancelFullScreen) {
+        (document as any).webkitCancelFullScreen();
+    }
+    //IE11
+    else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen();
+    }
+}
+// 全屏
+export function Fullscreen() {
+    const docElm = document.documentElement as any;
+    //W3C
+    if (docElm.requestFullscreen) {
+        docElm.requestFullscreen();
+    }
+    //FireFox
+    else if (docElm.mozRequestFullScreen) {
+        docElm.mozRequestFullScreen();
+    }
+    //Chrome等
+    else if (docElm.webkitRequestFullScreen) {
+        docElm.webkitRequestFullScreen();
+    }
+    //IE11
+    else if (docElm.msRequestFullscreen) {
+        docElm.msRequestFullscreen();
+    }
+}
 export const TwoCoordinateAzimuth: Function = function (start: any, end: any) {
     let d = 0,
         lat_a = (start.lat * Math.PI) / 180,

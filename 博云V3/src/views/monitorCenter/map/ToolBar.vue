@@ -1,11 +1,8 @@
 <template>
-  <div class="ToolBar">
+  <div class="ToolBar" :class="{ showVideo: videoFlag }">
     <div class="ToolBar__content">
-      <div
-        class="left"
-        :title="selectedVeh && address"
-      >
-        {{selectedVeh && address}}
+      <div class="left" :title="selectedVeh && address">
+        {{ selectedVeh && address }}
       </div>
       <div class="right">
         <div class="right__button">
@@ -14,133 +11,177 @@
             style="width: 100px"
             size="small"
           >
-            <a-select-option
-              v-for="item in type"
-              :key="item"
-            >
+            <a-select-option v-for="item in type" :key="item">
               {{ item }}
             </a-select-option>
           </a-select>
         </div>
-        <div class="right__items">
-          <a-tooltip placement="bottom">
+        <div
+          class="right__items"
+          :style="{
+            width: !videoFlag ? '350px' : switcFlag ? '390px' : '220px',
+          }"
+        >
+          <template v-if="!videoFlag || switcFlag">
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>{{ Satellite ? "卫星地图关" : "卫星地图开" }}</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('卫星地图')">
+                <i
+                  class="iconfont icon icon-weixingyuntu"
+                  :style="{ color: Satellite ? 'blue' : '' }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>{{ Traffic ? "路况图关" : "路况图开" }}</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('路况图')">
+                <i
+                  class="iconfont icon icon-hongludeng"
+                  :style="{ color: Traffic ? 'blue' : '' }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>{{ Cluster ? "聚合关" : "聚合开" }}</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('聚合')">
+                <i
+                  class="iconfont icon icon-juji"
+                  :style="{ color: Cluster ? 'blue' : '' }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>区域查车</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('区域查车')">
+                <i class="iconfont icon icon-quyuguanli"></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>测距</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('测距')">
+                <i class="iconfont icon icon-chizi"></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>位置点</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('位置点')">
+                <i
+                  class="iconfont icon icon-weizhidian"
+                  :style="{
+                    color:
+                      slideBoxType == '位置点' && slideBoxShow ? 'blue' : '',
+                  }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>围栏</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('围栏')">
+                <i
+                  class="iconfont icon icon-langan"
+                  :style="{
+                    color: slideBoxType == '围栏' && slideBoxShow ? 'blue' : '',
+                  }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>二押点</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('二押点')">
+                <i
+                  class="iconfont icon icon-weizhi"
+                  :style="{
+                    color:
+                      slideBoxType == '二押点' && slideBoxShow ? 'blue' : '',
+                  }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom" v-if="hasOcar">
+              <template #title>
+                <span>Ocar出入库</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('Ocar出入库')">
+                <i class="iconfont icon icon-churuku"></i>
+              </div>
+            </a-tooltip>
+          </template>
+          <template v-else>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>关闭直播</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('关闭直播')">
+                <i class="iconfont icon icon-guanbichuangkou"></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>一宫格</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('一宫格')">
+                <i
+                  class="iconfont icon icon-yigongge"
+                  :style="{ color: videoNum === 1 ? 'blue' : '' }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>四宫格</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('四宫格')">
+                <i
+                  class="iconfont icon icon-sigongge"
+                  :style="{ color: videoNum === 4 ? 'blue' : '' }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>六宫格</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('六宫格')">
+                <i
+                  class="iconfont icon icon-gongge2"
+                  :style="{ color: videoNum === 6 ? 'blue' : '' }"
+                ></i>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>八宫格</span>
+              </template>
+              <div class="iconBox" @click="toolBarFn('八宫格')">
+                <i
+                  class="iconfont icon icon-gongge3"
+                  :style="{ color: videoNum === 8 ? 'blue' : '' }"
+                ></i>
+              </div>
+            </a-tooltip>
+          </template>
+          <a-tooltip placement="bottom" v-if="videoFlag">
             <template #title>
-              <span>{{Satellite?"卫星地图关":"卫星地图开"}}</span>
+              <span>视频布局</span>
             </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('卫星地图')"
-            >
-              <i
-                class="iconfont icon icon-weixingyuntu"
-                :style="{color:Satellite?'blue':''}"
-              ></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template #title>
-              <span>{{Traffic?"路况图关":"路况图开"}}</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('路况图')"
-            >
-              <i
-                class="iconfont icon icon-hongludeng"
-                :style="{color:Traffic?'blue':''}"
-              ></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template #title>
-              <span>{{Cluster?"聚合关":"聚合开"}}</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('聚合')"
-            >
-              <i
-                class="iconfont icon icon-juji"
-                :style="{color:Cluster?'blue':''}"
-              ></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template #title>
-              <span>区域查车</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('区域查车')"
-            >
-              <i class="iconfont icon icon-quyuguanli"></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template #title>
-              <span>测距</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('测距')"
-            >
-              <i class="iconfont icon icon-chizi"></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template #title>
-              <span>位置点</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('位置点')"
-            >
-              <i
-                class="iconfont icon icon-weizhidian"
-                :style="{color:slideBoxType == '位置点'&&slideBoxShow?'blue':''}"
-              ></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template #title>
-              <span>围栏</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('围栏')"
-            >
-              <i
-                class="iconfont icon icon-langan"
-                :style="{color:slideBoxType == '围栏'&&slideBoxShow?'blue':''}"
-              ></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template #title>
-              <span>二押点</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('二押点')"
-            >
-              <i
-                class="iconfont icon icon-weizhi"
-                :style="{color:slideBoxType == '二押点'&&slideBoxShow?'blue':''}"
-              ></i>
-            </div>
-          </a-tooltip>
-          <a-tooltip
-            placement="bottom"
-            v-if="hasOcar"
-          >
-            <template #title>
-              <span>Ocar出入库</span>
-            </template>
-            <div
-              class="iconBox"
-              @click="toolBarFn('Ocar出入库')"
-            >
-              <i class="iconfont icon icon-churuku"></i>
+            <div class="iconBox" @click="toolBarFn('视频布局')">
+              <i class="iconfont icon icon-weibiaoti-"></i>
             </div>
           </a-tooltip>
         </div>
@@ -156,19 +197,12 @@ import {
   watch,
   inject,
   computed,
+  Ref,
 } from "vue";
 import { useFunction } from "../function";
 import { useStore } from "vuex";
 export default defineComponent({
   props: {
-    mapType: {
-      type: String,
-      default: "Bmap",
-    },
-    slideBoxShow: {
-      type: Boolean,
-      default: false,
-    },
     selectedVeh: {
       type: Object,
       default: null,
@@ -180,6 +214,8 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const store = useStore();
+    let slideBoxShow = inject("slideBoxShow") as any; // 围栏/位置点/二押点侧边栏visible
+    let updateSlideBoxShow = inject("updateSlideBoxShow") as Function;
     const hasOcar = computed(() => {
       if (!store.state.vehTypes) {
         return false;
@@ -190,7 +226,7 @@ export default defineComponent({
       return res && res[0] && res[0].typemap == "OCAR-3" ? true : false;
     });
     const { getAddress } = useFunction();
-    let { mapType, slideBoxShow } = toRefs(props);
+    let mapType = inject("mapType") as any;
     let Cluster = inject("Cluster") as any;
     let updateMapType = inject("updateMapType") as Function;
     const updateCluster = inject("updateCluster") as any;
@@ -201,13 +237,13 @@ export default defineComponent({
       Traffic: false,
       slideBoxType: "",
       address: "",
+      switcFlag: true,
     });
     let { Satellite, Traffic, slideBoxType } = toRefs(ToolData);
     watch(
       () => ToolData.defaultType,
       (newVal, oldVal) => {
         const type = newVal == "百度地图" ? "Bmap" : "Amap";
-        emit("update:mapType", type);
         updateMapType(type);
       }
     );
@@ -238,16 +274,20 @@ export default defineComponent({
     );
     function resert() {
       slideBoxType.value = "";
-      emit("update:slideBoxShow", false);
+      updateSlideBoxShow(false);
     }
     function openSlideBox(type: string) {
       if (!slideBoxShow.value) {
-        emit("update:slideBoxShow", true);
+        updateSlideBoxShow(true);
       } else if (slideBoxType.value == type) {
-        emit("update:slideBoxShow", false);
+        updateSlideBoxShow(false);
       }
       slideBoxType.value = type;
     }
+
+    const videoNum = <Ref<number>>inject("videoNum");
+    const updateVideoNum = inject("updateVideoNum") as Function;
+    const videoFlag = <Ref<boolean>>inject("videoFlag");
     function toolBarFn(type: string) {
       if (type == "卫星地图") {
         Satellite.value = !Satellite.value;
@@ -260,14 +300,29 @@ export default defineComponent({
       } else if (["围栏", "二押点", "位置点"].includes(type)) {
         openSlideBox(type);
         emit("toolBarFn", type);
+      } else if (type === "视频布局") {
+        ToolData.switcFlag = !ToolData.switcFlag;
+      } else if (type === "关闭直播") {
+        videoFlag.value = false;
+      } else if (type === "一宫格") {
+        updateVideoNum(1);
+      } else if (type === "四宫格") {
+        updateVideoNum(4);
+      } else if (type === "六宫格") {
+        updateVideoNum(6);
+      } else if (type === "八宫格") {
+        updateVideoNum(8);
       } else {
         emit("toolBarFn", type);
       }
     }
+
     return {
       toolBarFn,
       Cluster,
       hasOcar,
+      videoFlag,
+      videoNum,
       ...toRefs(props),
       ...toRefs(ToolData),
     };
@@ -283,6 +338,12 @@ export default defineComponent({
   height: 46px;
   background: transparent;
   padding: 0 10px;
+
+  &.showVideo {
+    padding: 0;
+    top: 0;
+  }
+
   &__content {
     overflow: hidden;
     width: 100%;
@@ -310,6 +371,9 @@ export default defineComponent({
       height: 100%;
       &__button {
         flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin-right: 20px;
       }
       &__items {
         width: 350px;

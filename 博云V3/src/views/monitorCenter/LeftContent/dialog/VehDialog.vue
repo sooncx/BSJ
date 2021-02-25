@@ -256,6 +256,7 @@ export default defineComponent({
         amountMoney: "",
         remark: "",
       } as any,
+      // 树状图转扁平数据
       treeConvertList(root: any) {
         const listMap = new Map();
         if (root) {
@@ -271,6 +272,7 @@ export default defineComponent({
         }
         return listMap;
       },
+      // 设置风控数据
       riskDataFormat() {
         let homeData = null;
         homeData =
@@ -288,7 +290,7 @@ export default defineComponent({
           data.riskInfoData.stayPointOption.company &&
           data.riskInfoData.stayPointOption.company.lat
             ? [
-                1,
+                2,
                 data.riskInfoData.stayPointOption.company.lat,
                 data.riskInfoData.stayPointOption.company.lng,
                 1000,
@@ -317,6 +319,7 @@ export default defineComponent({
       },
       handleClick: function () {},
     });
+    // 添加/修改车辆数据
     const editVehOk = async () => {
       if (props.type == "add") {
         const params = {
@@ -364,6 +367,7 @@ export default defineComponent({
       }
     };
     provide("editVehOk", editVehOk);
+    // 重置
     function clear() {
       data.activeName = "1";
       data.riskInfoData = {
@@ -469,22 +473,12 @@ export default defineComponent({
       // data.riskInfoData.companyAddress = res[1].address;
     }
     watch(
-      () => props.vehInfo,
-      (val) => {
-        // console.log(val, "vehInfo");
-      },
-      {
-        deep: true,
-        immediate: true,
-      }
-    );
-    watch(
       () => props.visible,
       (val) => {
         if (val) {
           if (props.type != "add") {
             if (!props.vehInfo || !props.vehInfo.V) {
-              showAMsg("车辆id 'V' 不存在或格式不对!");
+              showAMsg("车辆id不存在或格式不对!");
               return;
             }
             searchVehs();

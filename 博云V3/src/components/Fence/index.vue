@@ -97,7 +97,7 @@
                 <i class="iconfont icon-chizi"></i>
               </div>
             </el-tooltip>
-            
+
             <el-tooltip
               placement="left"
               effect="light"
@@ -332,6 +332,7 @@ import {
   watch,
   onMounted,
   computed,
+  inject
 } from "vue";
 import { useAmap } from "../../views/monitorCenter/map/Amap";
 import { VehGroupSelect } from "@/components/VehGroup/index";
@@ -348,10 +349,6 @@ export default defineComponent({
     VehGroupSelect,
   },
   props: {
-    mapType: {
-      type: String,
-      default: "Amap",
-    },
     fenceType: {
       type: String,
       default: "addFence",
@@ -390,7 +387,8 @@ export default defineComponent({
   },
   emits: ["enable", "update:visible", "setAddress", "FenceOkFn"],
   setup(props, { emit }) {
-    const { mapType, fenceType } = toRefs(props);
+    const { fenceType } = toRefs(props);
+    let mapType = inject("mapType") as any;
     let showType = ref(fenceType.value);
     const FenceMapRef = ref<HTMLDivElement | null>(null);
     let AmapObj = null as any;

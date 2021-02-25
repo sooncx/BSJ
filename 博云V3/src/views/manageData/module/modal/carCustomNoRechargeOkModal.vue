@@ -45,47 +45,56 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,reactive, toRefs,watch, h} from "vue";
-import API from "@/api/manageData";
+import { defineComponent,reactive, toRefs,watch,} from "vue";
 export default defineComponent({
   name: "carCustomNoRechargeOkModal",
   props: {
+    // 自定义不续费 返回数据集
     item:{
       type: Object,
       default: {
-        noPermission: [],
-        nonexistent: [],
-        success: []
+        noPermission: [],       // 无权限数据
+        nonexistent: [],        // 无设备数据 
+        success: []             // 成功数据
       }
     }
   },
   setup(props, { emit }) {
     const data = reactive({
-      tableData: <any>[],
-      successNum: 0,
-      noPermission: 0,
-      nonexistent: 0,
+      tableData: <any>[],       // 表格数据
+      successNum: 0,            // 成功数量
+      noPermission: 0,          // 无权限数量
+      nonexistent: 0,           // 无设备数量
     });
+    
+    // 提交方法
     const handleOk = () => {
       emit("update:visible", false);
     }
+
+    // 返回方法
     const handleBack = () => {
       emit("update:visible", false);
     }
+
+    // 监听自定义不续费 返回数据集
     watch(()=>props.item,(value)=>{
       data.tableData = [];
+      // 判断是否有成功数据
       if(value.success !== undefined){
         value.success.forEach((dataItem:any)=>{
           data.tableData.push({terminalNo:dataItem,status:'成功',class:'success'});
         });
         data.successNum = value.success.length;
       }
+      // 判断是否有无权限数据
       if(value.noPermission !== undefined){
         value.noPermission.forEach((dataItem:any)=>{
           data.tableData.push({terminalNo:dataItem,status:'没权限',class:'error'});
         });
         data.noPermission = value.noPermission.length;
       }
+      // 判断是否有无设备数据
       if(value.nonexistent !== undefined){
         value.nonexistent.forEach((dataItem:any)=>{
           data.tableData.push({terminalNo:dataItem,status:'无设备',class:'error'});

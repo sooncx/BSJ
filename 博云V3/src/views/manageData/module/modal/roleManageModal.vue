@@ -9,6 +9,7 @@
       </a-button>
     </template>
     <div class="modalBody">
+      <!-- 表单 -->
       <div class="modalBody__left">
         <a-form :model=form :rules="rules" ref="ruleForm" class="modalForm" >
           <div class="row">
@@ -26,6 +27,7 @@
           </div>
         </a-form>
       </div>
+      <!-- 资源树 -->
       <div class="modalBody__right">
         <Tree
           checkable
@@ -50,7 +52,8 @@ export default defineComponent({
   },
   name: "carSettleListModal",
   props: {
-    modalData: {
+    // 角色数据
+    roleInfo: {
       type: Object as PropType<any>,
       default: () => ({
         roleId: 0,
@@ -58,6 +61,7 @@ export default defineComponent({
         roleDesc: '',
       }),
     },
+    // 显示窗口状态
     visible: {
       type: Boolean,
       default: false,
@@ -65,24 +69,29 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const data = reactive({
-      modalLoading: false,
-      devNo: '',
-      treeData: [
-      ],
-      form: {
-        roleName: '',
-        roleDesc: '',
+      modalLoading: false,                        // 提交loading
+      treeData: [],                               // 资源树 数据
+      form: {                                     // 角色表单
+        roleName: '',                             // 角色名字
+        roleDesc: ''                              // 角色备足
       },
       rules: <any>{
         roleName: [{ required: true, message: '角色名称不能为空',  trigger: 'blur' }],
       },
-      ruleForm: <any>null,
-      selecResource: <any>[],
-      title: '新增角色',
+      ruleForm: <any>null,                        // 表单REF
+      selecResource: <any>[],                     // 选择资源树 数据
+      title: '新增角色',                           // 窗口标题 
     });
+    
+    // 获取资源树 数据
     const getResourceTree = async () => {
-      const { obj, msg, flag} = await API.resourceTree({});
-      data.treeData = obj;
+      try {
+        const { obj, msg, flag} = await API.resourceTree({});
+        if(flag !== 1) throw msg;
+        data.treeData = obj;
+      } catch (error) {
+        ElMessage.error(error);
+      }
     }
 
     const show = computed({
@@ -94,10 +103,8 @@ export default defineComponent({
 
     const getRoleInfo = async () => {
       try {
-        const { obj,msg,flag } = await API.getRole({roleId: props.modalData.roleId});
-        if(flag !== 1){
-          throw msg;
-        }
+        const { obj,msg,flag } = await API.getRole({roleId: props.roleInfo.roleId});
+        if(flag !== 1) throw msg;
         data.form.roleName = obj.roleName;
         data.form.roleDesc = obj.roleDesc;
         data.selecResource = obj.resourceIdList;
@@ -108,25 +115,25 @@ export default defineComponent({
     }
 
     watch(
-      () => props.visible,
-      async (val) => {
+      () => props.visible,async (val) => {
         if (!val) return;
         data.form.roleName = '';
         data.form.roleDesc = '';
         data.selecResource = [];
         getResourceTree();
-        if(props.modalData && props.modalData.roleId){
+        if(props.roleInfo && props.roleInfo.roleId){
           data.title = '修改角色';
           // 获取数据
           getRoleInfo();
-        }else{
-          data.title = '新增角色';
+          return;
         }
+        data.title = '新增角色';
       }
     );
     
 
     const handleOk = () =>{
+      data.modalLoading = true;
       data.ruleForm.validate().then(async () => {
         try {
           //判断是否选择了资源
@@ -136,17 +143,14 @@ export default defineComponent({
             roleDesc: data.form.roleDesc,
             resourceIdList: data.selecResource
           }
-          if(props.modalData && props.modalData.roleId){
-            const { msg, flag } = await API.updateRole({...info,roleId:props.modalData.roleId});
-            if(flag !== 1){
-              throw msg;
-            }
+          // 判断是否修改数据
+          if(props.roleInfo && props.roleInfo.roleId){
+            const { msg, flag } = await API.updateRole({...info,roleId:props.roleInfo.roleId});
+            if(flag !== 1) throw msg;
             ElMessage.success('修改成功');
           }else{
             const { msg, flag } = await API.addRole(info);
-            if(flag !== 1){
-              throw msg;
-            }
+            if(flag !== 1) throw msg;
             ElMessage.success('添加成功');
           }
           emit("update:visible", false);
@@ -155,10 +159,13 @@ export default defineComponent({
           ElMessage.error(error);
         }
       });
+      data.modalLoading = false;
     }
+    // 返回
     const handleback = () => {
       emit("update:visible", false);
     }
+    // 点击复选框返回数据
     const onCheck = (value:any) => {
       data.selecResource = value;
     }

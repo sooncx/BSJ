@@ -6,147 +6,25 @@
         <div class="tabs__item" :class="{active: activeTabIndex===item.value}" @click="selectTabs(item.value)" v-for="(item,index) in tabsItem" :key="index">{{item.title}}</div>
       </div>
       <!-- 搜索功能 -->
-      <div class="search">
-        <div class="search__left">
-          <div class="item">
-            <a-button type="primary" @click="showData(null,'add')">新建工单</a-button>
-            <a-button type="primary" @click="confirmData(null,'delete')">删除工单</a-button>
-          </div>
-        </div>
-        <div class="search__right">
-          <div class="item">
-            <a-select
-              v-model:value="searchType"
-              style="width: 120px"
-              ref="select"
-            >
-              <a-select-option
-              v-for="item in searchTypeOption"
-              :key="item.value"
-              :value="item.value">
-                {{item.label}}
-              </a-select-option>
-            </a-select>
-          </div>
-          <div class="item">
-            <a-input
-              v-if="searchType !== 2"
-              v-model:value="search.searchValues" 
-              placeholder="安装人员、车主、车牌号、设备号"
-              style="width: 235px;"
-            ></a-input>
-          </div>
-          <div class="item">
-            <a-select
-              v-if="searchType === 2"
-              v-model:value="installWorkerName"
-              style="width: 248px"
-              placeholder="安装人员"
-              @change="installWokerChange"
-            >
-              <a-select-option 
-              v-for="item in installWorkerList"
-              :value="item.userId"
-              :key="item.userId"
-              >
-                {{item.name}}<span v-if="item.flag === 2">(已离职)</span>
-              </a-select-option>
-            </a-select>
-          </div>
-          <div class="item">
-            <a-select
-              v-model:value="terminalTypeValue"
-              placeholder="设备类型"
-              style="width: 120px;margin-right:8px;"
-            >
-              <a-select-option v-for="(item,index) in vehTypes" :key="index" :value="item.type" >
-                {{item.typemap}}
-              </a-select-option>
-            </a-select>
-          </div>
-          <div class="item">
-            <SelectDate v-model:value="rangeDate" dateType="date" />
-          </div>
-          <div class="item">
-            <a-button type="primary" @click="onSearch()">
-              <template #icon><i class="iconfont icon icon-sousuo"></i></template>
-              查询</a-button>
-            <a-button @click="onExport()">
-              <template #icon><i class="iconfont icon icon-daochu"></i></template>
-              导出</a-button>
-          </div>
-        </div>
-      </div>
+      <searchCom
+      @type="settingFun"
+      @onSearch="onSearch"
+      ></searchCom>
     </div>
-    <div class="body">
+    <div style="flex:1;">
       <!-- 表格  -->
-      <div class="table_body detailTable" ref="tableBox">
-        <el-table
-          :data="tableData"
-          v-if="column.length !== 0"
-          border
-          style="width: 100%;position:absolute;"
-          :height="offsetHeight"
-          size="small"
-          v-loading="tableLoading"
-          @selection-change="handleSelectionChange"
-        >
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            v-for="(item, index) in column"
-            :key="index"
-            :label="item.title"
-            :prop="item.dataIndex"
-            :min-width="item.width"
-            :align="item.align"
-          >
-            <template #default="scope" v-if="['installWorkerName','status','carList','installPosition','terminalNo'].includes(item.dataIndex)">
-              <template  v-if="item.dataIndex === 'status'">
-                <a-tag :color="getStatusStr(scope.row.status,'tag')">{{getStatusStr(scope.row.status,'title')}}</a-tag>
-              </template>
-              <template  v-if="item.dataIndex === 'carList'">
-                <p v-for="(item,index) in scope.row.workSheetDeviceVo" :key="index" class="workPlate" @click="toMonitorCenter(scope.row,item)"><span>{{item.plate}}</span>({{item.terminalType}})</p>
-              </template>
-              <template v-if="item.dataIndex === 'installPosition'">
-                <span v-for="(item,index) in scope.row.workSheetDeviceVo" :key="index">{{item.installPosition}}</span>
-              </template>
-              <template v-if="item.dataIndex === 'terminalNo'">
-                <span v-for="(item,index) in scope.row.workSheetDeviceVo" :key="index">{{item.terminalNo}}<br/></span>
-              </template>
-              <template  v-if="item.dataIndex === 'installWorkerName'">
-                {{scope.row.installWorkerName}}<span v-if="scope.row.installWorkerFlag === 2">(已离职)</span>
-              </template>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right" width="120" header-align="center">
-            <template #default="scope">
-              <div class="setting">
-                <span @click="showData(scope.row,'show')">查看</span>
-                <span v-if="scope.row.status === 3" @click="confirmData(scope.row,'complete')" >完成</span>
-                <span v-if="scope.row.status < 3" @click="showData(scope.row,'edit')">修改</span>
-                <span v-if="scope.row.status < 3 " @click="confirmData(scope.row,'cancel')">取消</span>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <!-- 分页功能 --> 
-      <div class="body__page">
-        <a-pagination
-          show-size-changer
-          :page-size-options="pagination.pageSizeOptions"
-          :total="pagination.total"
-          :show-total="(total) => `共: ${pagination.total} 条`"
-          size="small"
-          v-model:pageSize="pagination.pageSize"
-          v-model:current="pagination.current"
-          @change="currentChange"
-          @showSizeChange="currentChange"
-        />
-      </div>
+      <tableCom
+      :activeTabIndex="activeTabIndex"
+      :tableAllData="tableData"
+      :total="total"
+      :tableLoading="tableLoading"
+      :pageNumber="search.pageNumber"
+      :pageSize="search.pageSize"
+      @onSearch="onSearch"
+      @currentChange="currentChange"
+      @selectionChange="selectionChange"
+      @type="settingFun"
+      ></tableCom>
     </div>
     <!-- 查看工单 -->
     <carWorkSheetModal v-model:visible="modalVisible" :type="modalType" :dataItem="modalItem" @workSheetHandOk="workSheetHandOk" ></carWorkSheetModal>
@@ -154,96 +32,70 @@
 </template>
 <script lang="ts">
 import { defineComponent,toRefs,reactive,nextTick,watch  } from "vue";
+import searchCom from "./search.vue";
+import tableCom from "./table.vue";
 import { carWorkSheetModal } from "@/views/manageData/module/index";
-import SelectDate from "@/views/manageData/module/src/SelectDate.vue";
-import { useStore } from "vuex";
 import { Modal  } from 'ant-design-vue';  
-import router from "@/router";
 import API from "@/api/manageData";
-import { 
-  parament,
-  getStatusStr,
-  deleteWorkSheet,
-  changestatusWorkSheet,
-} from "./index";
+import router from "@/router";
 import { ElMessage } from "element-plus";
 export default defineComponent({
   components: {
     carWorkSheetModal,
-    SelectDate
+    searchCom,
+    tableCom
   },
   setup() {
-    const store = useStore();
     const data = reactive({
-      activeTabIndex: 0,
-      searchType: 0,
-      terminalTypeValue: '全部设备',
-      search:{ 
-        searchType: -1,
-        searchValues: <string | null>'',
-        terminalType: <any>null,
-        userId: -1,
-        status: 0,
-        endTime: '',
-        pageNumber: 1,
-        pageSize: 50,
-        startTime: ''
-      },
-      rangeDate: ['',''],
-      tableData : <any>[],      //表格数据
-      pagination :{             // 分页配置
-        showTotal: (total:string) => `共 ${total} 条数据`,  // 显示总数
-        showSizeChanger: true,  // 是否允许选中 指定数量
-        pageSize: 40,           // 分页数量
-        total: 0,
-        current:1,
-        pageSizeOptions: ['40','60','80','100'], //指定数量
-      },
-      column: <any>[],
-      modalVisible: false,
-      modalType: 'add',
-      modalItem: null,
-      selectedRowKeys: <any>[],
-      tableLoading: false,
-      installWorkerList: <any>[],
-      installWorkerName: <any>null,
-      vehTypes: store.state.vehTypes,
-      offsetHeight: <any>null,
-      offsetWidth: <any>null,
-      tableBox: <any>null,
-      ...parament
+      activeTabIndex: 0,                // 标签页
+      search:<any>{},                   // 搜索条件
+      modalVisible: false,              // 弹窗显示状态
+      modalType: 'add',                 // 弹窗类型
+      modalItem: null,                  // 弹窗数据
+      tableData: <any>[],               // 表格数据
+      tableLoading: false,              // 表格Loading
+      tableSelectsRow: <any>[],         // 表格多选值 
+      total: 0,                         // 总数
+      tabsItem: [                       // 标签页内容
+        { title: '全部',value: 0 },
+        { title: '待确认',value: 1 },
+        { title: '待安装',value: 2 },
+        { title: '已安装',value: 3 },
+        { title: '已完成',value: 4 },
+        { title: '已取消',value: 5 },
+      ],
     });
-    data.vehTypes.unshift({type:'',typemap:'全部设备'});
-    watch(
-      () => data.activeTabIndex,
-      () => {
-        data.column = [];
-        data.tableData = [];
-        nextTick(() => {
-          changeTableHeader();
-          getData();
-        });
+    
+    // 完成和取消工单
+    const changestatusWorkSheet = async (status:number,id:number) => {
+      try {
+        const {flag,msg} = await API.updateWorkSheetStatus({id,status});
+        if(flag !== 1) throw msg;
+        if(status === 5) ElMessage.success('取消成功');
+        if(status === 4) ElMessage.success('完成成功');
+      } catch (error) {
+        ElMessage.error(error);
       }
-    );
-    nextTick(() => {
-      data.offsetHeight = data.tableBox.offsetHeight;
-      data.offsetWidth = data.tableBox.offsetWidth;
-      getInstallWorker();
-    });
-    //车辆跳转监控中心
-    const toMonitorCenter = (row:any,item:any) => {
-      router.push({
-        name: "monitorCenter",
-        params: {
-          vehicleId: item.deviceId,
-          groupId: item.groupId,
-          plate: item.plate,
-        },
+    }
+
+    // 删除工单
+    const deleteWorkSheet = async (selectedRowKeys:any) => {
+      let ids = '';
+      selectedRowKeys.forEach((item:any)=>{
+        ids += item.id + ',';
       });
+      ids = ids.substring(0,ids.length-1);
+      try {
+        const {flag,msg} = await API.deleteWorkSheet({ids});
+        if(flag !== 1) throw msg;
+        ElMessage.success('删除成功');
+      } catch (error) {
+        ElMessage.error(error);
+      }
     }
     
-    //处理工单
-    const confirmData = (record:any, type:string) => {
+    // 处理工单
+    const confirmData = (record:any, type:string,selectedRowKeys:any=[]) => {
       let msg:string = '';
       switch(type){
         case 'delete':
@@ -255,8 +107,8 @@ export default defineComponent({
         case 'cancel':
           msg = '取消';
       }
-
-      if(type=== 'delete' && data.selectedRowKeys.length === 0){
+      // 删除工单判断是否有选择数据
+      if(type=== 'delete' && selectedRowKeys.length === 0){
         ElMessage.error('请在表格中选择需要删除的工单');
         return false;
       }
@@ -266,7 +118,7 @@ export default defineComponent({
         okText: '确定',
         cancelText: '取消',
         onOk() {
-          if(type === 'delete') deleteWorkSheet(data.selectedRowKeys);
+          if(type === 'delete') deleteWorkSheet(selectedRowKeys);
           if(type === 'complete') changestatusWorkSheet(4,record.id);
           if(type === 'cancel') changestatusWorkSheet(5,record.id);
           setTimeout(function (){
@@ -275,23 +127,19 @@ export default defineComponent({
         }
       });
     }
-    // 选择安装人员
-    const installWokerChange = (item:any,row:any) => {
-      data.search.searchValues = row.value;
-      data.search.userId = row.key;
-      data.installWorkerName = row.value;
-    }
-    // 表格多选数据
-    const handleSelectionChange = (e:any) => {
-      data.selectedRowKeys = e;
-    }
 
-    //导出
+    // 搜索条件整合
+    const checkSearch = () => {
+      let params = {
+        ...data.search
+      }
+      params.searchType = data.search.searchValues !== '' ? data.search.searchType : -1;
+      return params;
+    }
+    
+    // 导出
     const onExport = () => {
-      data.search.searchType = data.search.searchValues !== '' ? data.searchType : -1;
-      data.search.startTime = data.rangeDate[0];
-      data.search.endTime = data.rangeDate[1];
-      API.exportWorkSheet({...data.search,type:0});
+      API.exportWorkSheet({...checkSearch(),type:0});
     }
 
     // 新增或修改工单 成功回调
@@ -302,96 +150,63 @@ export default defineComponent({
       getData();
     }
         
-    //查询
-    const onSearch = () => {
-      data.pagination.current = 1;
+    // 查询
+    const onSearch = (search:any) => {
+      data.search = search;
+      data.search.pageNumber = 1;
       getData();
     }
-
-    // 分页功能
-    const currentChange = (page: number, pageSize: number) => {
-      data.pagination.current = page;
-      data.pagination.pageSize = pageSize;
-      getData();
-    };
 
     // 获取工单数据
     const getData = async () => {
       data.tableLoading = true;
-      data.tableData = [];
       try {
-        data.search.terminalType = data.terminalTypeValue;
-        //判断设备是否全部设备类型
-        if(data.terminalTypeValue === '全部设备'){
-          data.search.terminalType = '';
-        }
-        //判断是否有搜索条件
-        data.search.searchType = data.search.searchValues !== '' ? data.searchType : -1;
-        data.search.pageSize = data.pagination.pageSize;
-        data.search.pageNumber = data.pagination.current;
-        data.search.startTime = data.rangeDate[0];
-        data.search.endTime = data.rangeDate[1];
-        const { obj,flag,msg } = await API.pageWorkSheetListByCondition(data.search);
-        if(flag !== 1){
-          throw msg;
-        }
-        data.pagination.total = obj.total;
+        const { obj,flag,msg } = await API.pageWorkSheetListByCondition(checkSearch());
+        if(flag !== 1) throw msg;
         data.tableData = obj.data;
+        data.total = obj.total;
       } catch (error) {
         ElMessage.error(error);
       }
       data.tableLoading = false;
     }
+    
     // 监听路由路径
     watch(() => router.currentRoute.value.name,(val, old: any) => {
       if (!val || val != "workSheet") return;
       if (!router.currentRoute.value || !router.currentRoute.value.params) return;
       if (router.currentRoute.value.params.type) {
-        const { type, installWorkerId, installWorkerName } = router.currentRoute.value.params;
+        const { type } = router.currentRoute.value.params;
         switch(type){
-          case 'workSheet':
+          case 'workSheet':             // 全部
             data.activeTabIndex = 0;
             break;
-          case 'confirmCounts':
+          case 'confirmCounts':         // 待确认
             data.activeTabIndex = 1;
             break;
-          case 'processiveCounts':
+          case 'processiveCounts':      // 待安装
             data.activeTabIndex = 2;
             break;
         }
-        data.search.searchValues = installWorkerName as any;
-        data.search.userId = installWorkerId as any;
-        data.installWorkerName = installWorkerName;
-        data.searchType = 2;
-        data.pagination.total = 0;
-        data.tableData = [];
       }
-      nextTick(()=>{
-        changeTableHeader();
-        getData();
-      });
       },{ deep: true, immediate: true,}
     );
-    const selectTabs = (name:number) =>{
-      data.activeTabIndex = name;
+
+    // 选择标签页
+    const selectTabs = (index:number) =>{
+      data.activeTabIndex = index;
+      data.search.status = index;
+      data.tableData = [];
+      getData();
     }
 
-    // 切换表头
-    const changeTableHeader = () => {
-      let tableHeader = [];
-      for(let i=0; i< parament.headerArray[data.activeTabIndex].length; i++){
-        tableHeader.push(parament.tableHead[parament.headerArray[data.activeTabIndex][i]]);
-      }
-      data.selectedRowKeys = [];
-      data.search.status = data.activeTabIndex;
-      data.column = tableHeader;
-    }
+    // 分页功能
+    const currentChange = (page: number, pageSize: number) => {
+      data.search.pageNumber = page;
+      data.search.pageSize = pageSize;
+      getData();
+    };
 
-    //获取安装人员列表
-    const getInstallWorker = async () => {
-      const { obj } = await API.pageInstallWorker();
-      data.installWorkerList = obj;
-    }
 
     // 查看 修改 新建工单功能
     const showData = (record:any, type:string) => {
@@ -399,18 +214,40 @@ export default defineComponent({
       data.modalType = type;
       data.modalItem = record;
     }
+
+    // 功能聚合
+    const settingFun = (type:any,value:any=null) => {
+      // 添加  查看  修改
+      if(type === 'add' || type === 'show' || type === 'edit'){
+        showData(value,type);return;
+      }
+      // 删除 
+      if(type === 'delete'){
+        confirmData(value,'delete',data.tableSelectsRow);return;
+      }
+      // 完成 取消
+      if(type === 'complete' || type === 'cancel'){
+        confirmData(value,type);return;
+      }
+      // 导出
+      if(type === 'export'){
+        onExport();return;
+      }
+    }
+
+    // 表格多选
+    const selectionChange = (row:any) => {
+      data.tableSelectsRow = row;
+    }
     return {
-      toMonitorCenter,
-      changeTableHeader,
+      selectionChange,
+      settingFun,
+      currentChange,
       onSearch,
       onExport,
-      getStatusStr,
-      installWokerChange,
-      handleSelectionChange,
       showData,
       workSheetHandOk,
       selectTabs,
-      currentChange,
       confirmData,
       ...toRefs(data)
     };
@@ -418,6 +255,41 @@ export default defineComponent({
 });
 </script>
 <style lang="less" scoped>
-@import "../../../dataReport/module/css/index";
-@import "./index.less";
+
+.content{
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  padding-top:5px;
+  flex-direction: column;
+  background-color: rgb(255, 255, 255);
+  .header{
+    .tabs{
+      width:100%;
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #e8e8e8;
+      &__item{
+        padding: 0 36px;
+        font-size: 14px;
+        line-height: 50px;
+        font-family: PingFang-SC-Bold;
+        font-weight: 700;
+        color: #acb0b7;
+        cursor: pointer;
+      }
+      .active{
+        color: #1184e5;
+        border-bottom: 3px solid #1184e5;
+      }
+    }
+    
+  }
+}
+
+::v-deep(.ant-table-wrapper){
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
 </style>

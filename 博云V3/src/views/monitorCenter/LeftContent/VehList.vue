@@ -5,7 +5,7 @@
         <VehFuzzySearch
           v-model:value="FuzzySearch"
           :groupVisible="false"
-          :inputStyle="{width: '100%'}"
+          :inputStyle="{ width: '100%' }"
         />
       </div>
       <div class="itemBar">
@@ -14,9 +14,12 @@
           class="item"
           v-for="(item, index) in items"
           :key="index"
-          :style="{background:selectItem == item.value?'#075ED2':'',color:selectItem == item.value?'#fff':''}"
+          :style="{
+            background: selectItem == item.value ? '#075ED2' : '',
+            color: selectItem == item.value ? '#fff' : '',
+          }"
         >
-          {{item.label}}{{'('+item.count+')'}}
+          {{ item.label }}{{ "(" + item.count + ")" }}
         </div>
       </div>
       <div
@@ -27,23 +30,31 @@
         <div class="Paging">
           <div
             class="Paging__prev"
-            :class="currentPage>1?'work':''"
+            :class="currentPage > 1 ? 'work' : ''"
             @click="currentChange('prev')"
-          >上一页</div>
-          <div class="Paging__pages">{{currentPage}}/{{Math.ceil(total/mypageSize)}}</div>
+          >
+            上一页
+          </div>
+          <div class="Paging__pages">
+            {{ currentPage }}/{{ Math.ceil(total / mypageSize) }}
+          </div>
           <div
             class="Paging__next"
-            :class="currentPage<Math.ceil(total/mypageSize)?'work':''"
+            :class="currentPage < Math.ceil(total / mypageSize) ? 'work' : ''"
             @click="currentChange('next')"
-          >下一页</div>
+          >
+            下一页
+          </div>
         </div>
         <div
           class="btn"
           @click="allVehFn"
           :class="{
-            btnDisable:loading || usingVehsCounts == 0
+            btnDisable: loading || usingVehsCounts == 0,
           }"
-        >{{isChoseAllVeh()?"取消全选":"全部选择"}}</div>
+        >
+          {{ isChoseAllVeh() ? "取消全选" : "全部选择" }}
+        </div>
       </div>
       <div
         v-loading="vehloading"
@@ -61,36 +72,42 @@
         <div
           v-else
           class="vehItem"
-          @click="stopScroll = true, choseVeh(item)"
+          @click="(stopScroll = true), choseVeh(item)"
           @dblclick="cancleVeh(item)"
-          v-for="(item, index) in tableData.slice(((currentPage % 6 == 0?6:currentPage % 6) - 1) * mypageSize,(currentPage % 6 == 0?6:currentPage % 6) * mypageSize)"
+          v-for="(item, index) in tableData.slice(
+            ((currentPage % 6 == 0 ? 6 : currentPage % 6) - 1) * mypageSize,
+            (currentPage % 6 == 0 ? 6 : currentPage % 6) * mypageSize
+          )"
           :key="index"
           :class="{
-            veh_active:selectedVeh && selectedVeh.V == item.V,
-            veh_on:selectVehId.has(item.V) &&  (!selectedVeh || selectedVeh.V !== item.V),
-            veh_disable:[3,4].includes(item.Z),
-            veh_cannotActive: cannotSelectedVeh && cannotSelectedVeh.V == item.V,
+            veh_active: selectedVeh && selectedVeh.V == item.V,
+            veh_on:
+              selectVehId.has(item.V) &&
+              (!selectedVeh || selectedVeh.V !== item.V),
+            veh_disable: [3, 4].includes(item.Z),
+            veh_cannotActive:
+              cannotSelectedVeh && cannotSelectedVeh.V == item.V,
           }"
-          :style="{background:index%2==0?'#F7F7F7':''}"
+          :style="{ background: index % 2 == 0 ? '#F7F7F7' : '' }"
         >
           <div
             class="left"
             :class="{
-              veh_alarm:item && item.B && item.B != '',
-              veh_stop:item && item.Z == 2,
-              veh_drive:item && item.Z == 1
-              }"
+              veh_alarm: item && item.B && item.B != '',
+              veh_stop: item && item.Z == 2,
+              veh_drive: item && item.Z == 1,
+            }"
           >
-            <i class="iconfont icon-car"></i>
-            <div :title="item.P">{{item.P}}</div>
+            <i class="iconfont icon-car1"></i>
+            <div :title="item.P">{{ item.P }}</div>
           </div>
           <div
             class="middle"
             :class="{
-              veh_alarm:item && item.B && item.B != '',
-              veh_stop:item && item.Z == 2,
-              veh_drive:item && item.Z == 1
-              }"
+              veh_alarm: item && item.B && item.B != '',
+              veh_stop: item && item.Z == 2,
+              veh_drive: item && item.Z == 1,
+            }"
           >
             <i
               class="iconfont"
@@ -102,13 +119,23 @@
               :class="getLevel(item.CL)"
               @click.stop="getMouseEvent($event, item, '关注')"
             ></i>
-            <div :title="getVehState(item.Z, item.d, item.timeInterval)">{{getVehState(item.Z, item.d, item.timeInterval)}}</div>
+            <div :title="getVehState(item.Z, item.d, item.timeInterval)">
+              {{ getVehState(item.Z, item.d, item.timeInterval) }}
+            </div>
+          </div>
+          <div class="vedio">
+            <i
+              class="iconfont icon-zhibobofangshexiangjiguankanmianxing"
+              @click.stop="showVideo(item)"
+            ></i>
           </div>
           <div
             class="right_renew"
             v-if="[4].includes(item.Z)"
             @click.stop="charge(item)"
-          >续费</div>
+          >
+            续费
+          </div>
           <div
             v-else
             class="right"
@@ -149,6 +176,7 @@ import {
   computed,
   defineAsyncComponent,
   inject,
+  Ref,
 } from "vue";
 import router from "@/router";
 import { deepClone } from "../../../assets/js/base";
@@ -156,7 +184,6 @@ import VehFuzzySearch from "@/components/VehGroup/src/VehFuzzySearch.vue";
 import API from "../../../api/monitorCenter";
 import lodash from "lodash";
 import { debounce } from "@/assets/js/base";
-import LoginVue from "@/views/login/Login.vue";
 import { useFunction } from "../function";
 import { carRechargeModal } from "@/views/manageData/module/index";
 import { useStore } from "vuex";
@@ -186,40 +213,42 @@ export default defineComponent({
       default: () => {},
     },
   },
+  emits: ["outPutVideo", "update:selectedVeh", "update:selectedAllVehs", "update:SearchValue"],
   setup(props, { emit }) {
     const store = useStore();
     const { showMsg, querySettleDetail } = useFunction();
     const vheResert = inject("vheResert") as any;
     let updateAssociatedVehs = inject("updateAssociatedVehs") as Function;
     let cycleCecond = inject("cycleCecond") as any;
+    let updateTachograph = inject("updateTachograph") as Function;
     // const OptionMenuDialogFn = inject("OptionMenuDialogFn") as Function;
     const chosedVeh = inject("chosedVeh") as any;
+    const videoFlag = <Ref<boolean>>inject("videoFlag");
     const data = reactive({
-      popType: "侧边设置",
-      popoverList: [] as any,
-      carRechargeModelVisible: false,
-      selectTableItem: [] as any,
-      cannotSelectedVeh: null,
-      vehInfo: null as any,
-      FuzzySearch: null as any,
-      selectItem: 0,
-      selectVehId: new Set(),
-      vehlistMap: new Map(),
+      popType: "侧边设置", // 指令列表类型
+      popoverList: [] as any, // 指令列表
+      carRechargeModelVisible: false, // 续费弹窗visible
+      selectTableItem: [] as any, // tab栏类型数据
+      cannotSelectedVeh: null, // 当前要选中的不可选车辆
+      vehInfo: null as any, // 当前选中车辆
+      FuzzySearch: null as any, // 模糊搜索数据
+      selectItem: 0, // 当前选中tab栏
+      selectVehId: new Set(), // 选中车辆id集合
+      vehlistMap: new Map(), // 车辆列表集合
       total: 0,
       loading: false,
       vehloading: false,
-      usingVehsCounts: 0,
+      usingVehsCounts: 0, // 可选车辆总数
       popoverRef: null,
-      optionList: [],
       popoverVisible: false,
-      popMouseEvent: {},
+      popMouseEvent: {}, // 车辆选项点击位置,用于设置指令列表展示位置
       currentPage: 1,
       realCurrentPage: 1,
       pageSize: 1200,
       mypageSize: 200,
       tableData: [],
       searchVehId: null, // 模糊搜索车辆id
-      clickTimer: null as any,
+      clickTimer: null as any, // 单击选中/双击取消车辆定时器
       stopScroll: false, // 是否允许车辆列表滚动到选中车辆位置标识
       items: [
         {
@@ -238,11 +267,18 @@ export default defineComponent({
           count: 0,
         },
       ],
+      showVideo(veh: any) {
+        let obj = { name: "行车记录仪", vehInfo: veh };
+        updateTachograph(obj);
+        videoFlag.value = true;
+        emit("outPutVideo", { ...obj });
+      },
       choseItem: function (value: number) {
         data.selectItem = value;
         data.currentPage = 1;
         loadVehicles();
       },
+      // 续费
       charge(item: any) {
         data.carRechargeModelVisible = true;
         data.selectTableItem = [
@@ -266,6 +302,7 @@ export default defineComponent({
           });
         updateAssociatedVehs(arr);
       },
+      // 选中车辆
       choseVeh: function (veh: any) {
         if ([4].includes(veh.Z)) {
           showMsg("车辆已过期!");
@@ -285,6 +322,7 @@ export default defineComponent({
           data.selectVehId.add(veh.V);
         }, 200);
       },
+      // 取消选中车辆
       cancleVeh(veh: any) {
         data.stopScroll = false;
         if ([3, 4].includes(veh.Z)) return;
@@ -295,6 +333,7 @@ export default defineComponent({
         handleOnVehItemClick(veh, false);
         data.selectVehId.delete(veh.V);
       },
+      // 全选/取消全选车辆
       allVehFn() {
         let copyVeh = null;
         let copyAllVehs = new Map();
@@ -334,6 +373,7 @@ export default defineComponent({
         }
         return false;
       },
+      // 获取车辆类型
       getVehState(state: number, time: string, timeInterval: string) {
         if (timeInterval) {
           return "[" + timeInterval + "回传]";
@@ -359,6 +399,7 @@ export default defineComponent({
             break;
         }
       },
+      // 获取车辆关注度
       getLevel(level: any) {
         switch (level) {
           case 1:
@@ -375,6 +416,7 @@ export default defineComponent({
             break;
         }
       },
+      // 获取车辆充放电类型
       getChargeType(type: any) {
         switch (type) {
           case 0:
@@ -395,6 +437,7 @@ export default defineComponent({
         }
       },
     });
+    // 关联车辆数据
     const AssociateOpen = computed(() => {
       if (!store.state.systemSetList || store.state.systemSetList.length == 0) {
         return false;
@@ -412,6 +455,7 @@ export default defineComponent({
         updateAssociatedVehs([]);
       }
     });
+    // 判断是否显示充放电图标
     const showChargeType = computed(() => {
       if (!store.state.systemSetList || store.state.systemSetList.length == 0) {
         return false;
@@ -425,6 +469,7 @@ export default defineComponent({
       return config;
     });
     nextTick(() => {
+      // 监听当前页数
       watch(
         () => data.currentPage,
         (val: number, old: number) => {
@@ -448,6 +493,7 @@ export default defineComponent({
           }
         }
       );
+      // 监听当前选中车辆
       watch(
         () => props.selectedVeh,
         (val, old: any) => {
@@ -478,7 +524,7 @@ export default defineComponent({
           immediate: true,
         }
       );
-      // 监听路由路径
+      // 监听路由路径，用于其它模块跳转到监控中心并选中车辆
       watch(
         () => router.currentRoute.value.name,
         (val, old: any) => {
@@ -507,6 +553,7 @@ export default defineComponent({
           immediate: true,
         }
       );
+      // 其它页面或模块导致类似选中车辆变化的操作，如点击关联车辆列表不会导致选中当前车辆变化，但是要触发选中车辆变化的相关函数
       watch(
         chosedVeh,
         (val, old) => {
@@ -578,6 +625,7 @@ export default defineComponent({
           deep: true,
         }
       );
+      // 监听选中车组
       watch(
         () => props.selectGroupId,
         async (val, old: any) => {
@@ -599,9 +647,11 @@ export default defineComponent({
           deep: true,
         }
       );
+      // 监听刷新车辆列表标识
       watch(vheResert, (val: boolean) => {
         loadVehicles(false);
       });
+      // 监听轮询秒数
       watch(cycleCecond, (val: number) => {
         if (val === 0 && router.currentRoute.value.name == "monitorCenter") {
           data.vehloading = false;
@@ -741,6 +791,7 @@ export default defineComponent({
         emit("update:selectedVeh", copyVeh);
       }
     }
+    // 点击车辆操作
     function handleOnVehItemClick(veh: any, flag: boolean) {
       let copyVeh = null;
       let copyAllVehs = new Map();
@@ -819,6 +870,7 @@ export default defineComponent({
       }
       // data.tableData = arr;
     }
+    // 关注度设置
     function getMouseEvent(event: any, vehInfo: Object, type: string) {
       data.popoverList = [];
       data.popoverVisible = true;
@@ -829,22 +881,7 @@ export default defineComponent({
       const { clientX, clientY } = event;
       data.popMouseEvent = { clientX, clientY };
     }
-    function changeData(item: any) {
-      let num = Math.random();
-      let num2 = Math.random();
-      const selectedAllVehsCopy = props.selectedAllVehs;
-      const oldData = props.selectedAllVehs.get(item.V);
-      if (!oldData) return;
-      oldData.Y = num + oldData.Y;
-      oldData.X = num2 + oldData.X;
-      oldData.F = parseInt((Math.random() * 360) as any);
-      selectedAllVehsCopy.set(item.V, oldData);
-      emit("update:selectedAllVehs", selectedAllVehsCopy);
-      emit("update:selectedVeh", { ...oldData });
-    }
-    onMounted(() => {});
     return {
-      changeData,
       showChargeType,
       getMouseEvent,
       ...toRefs(data),
@@ -966,7 +1003,7 @@ export default defineComponent({
           }
         }
         .left {
-          width: calc(47% - 10px);
+          width: calc(45% - 10px);
           height: 100%;
           padding-left: 10px;
           font-size: 14px;
@@ -977,7 +1014,7 @@ export default defineComponent({
           }
         }
         .middle {
-          width: calc(53% - 25px);
+          width: calc(50% - 35px);
           height: 100%;
           padding-left: 10px;
           div {
@@ -997,18 +1034,24 @@ export default defineComponent({
             color: blue;
           }
         }
+
+        .vedio,
         .right {
           width: 20px;
           height: 100%;
           position: relative;
           right: -10px;
           i {
+            font-size: 14px;
             cursor: pointer;
             color: #7e91aa;
             &:hover {
               color: blue;
             }
           }
+        }
+        .vedio {
+          right: 0px;
         }
       }
     }

@@ -43,14 +43,17 @@
             v-permission="151001"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="151002"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="151002"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -79,6 +82,7 @@ export default defineComponent({
   components: {
     BasicTemplate,
     SelectDate,
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
@@ -148,24 +152,28 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "操作用户",
         align: "center",
         key: "operUserName",
         width: 160,
+        visible: true
       },
       {
         title: "操作类型",
         align: "center",
         key: "operType",
         width: 160,
+        visible: true
       },
       {
         title: "操作时间",
         align: "center",
         key: "operTime",
         width: 160,
+        visible: true
       },
       {
         title: "用户名(车牌号、车组名)",
@@ -173,11 +181,13 @@ export default defineComponent({
         key: "operation",
         width: 200,
         slots: { customRender: "operation" },
+        visible: true
       },
       {
         title: "备注",
         align: "center",
         key: "remark",
+        visible: true
       },
     ]);
 

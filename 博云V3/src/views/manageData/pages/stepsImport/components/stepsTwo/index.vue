@@ -33,27 +33,19 @@
           <template #operation="{ text, record }">
             <div class="editable-row-operations">
               <span v-if="record.editable">
-                <a-button 
-                size="small"
-                type="primary"
-                @click="save(record.id)"
-                >
+                <a-button  size="small" type="primary" @click="save(record.id)">
                   保存
                 </a-button>
-                <a-button 
-                size="small"
-                type="primary"
-                @click="cancel(record.id)"
-                >
+                <a-button size="small" type="primary" @click="cancel(record.id)">
                   取消
                 </a-button>
               </span>
               <span v-else>
                 <a-button 
-                size="small"
-                v-bind="editingKey !== '' ? { disabled: 'disabled' } : {}"
-                type="primary"
-                @click="edit(record.id)"
+                  size="small"
+                  v-bind="editingKey !== '' ? { disabled: 'disabled' } : {}"
+                  type="primary"
+                  @click="edit(record.id)"
                 >
                   修改
                 </a-button>
@@ -71,11 +63,6 @@
         上一步
       </a-button> -->
     </div>
-    <stepsImportEditModal
-    v-model:visible="stepsImportEditVisible"
-    :dataItem="selectItem"
-    @stepsImportEditOk="stepsImportEditOk"
-    ></stepsImportEditModal>
   </div>
 </template>
 <script lang="ts">  
@@ -83,16 +70,15 @@ import columns from './columns';
 import API from "@/api/manageData";
 import { defineComponent,toRefs,PropType,watch,reactive } from "vue";
 import { ExclamationCircleFilled } from '@ant-design/icons-vue';
-import { stepsImportEditModal } from '@/views/manageData/module/index';
 import { ElMessage } from 'element-plus';
 import { Modal  } from 'ant-design-vue'; 
 import { useStore } from "vuex";
 export default defineComponent({
   components: {
     ExclamationCircleFilled,
-    stepsImportEditModal
   },
   props:{
+    // 上传成功返回数据集
     uploadData: {
       type: Object as PropType<any>,
       default: {
@@ -103,11 +89,10 @@ export default defineComponent({
   setup(props, {emit}) {
     const store = useStore();
     const data = reactive({
-      tableData : <any>[],      //表格数据
-      errorNum: 0,
-      rightNum: 0,
-      stepsImportEditVisible: false,
-      selectItem: <any>null,
+      tableData : <any>[],      // 表格数据
+      errorNum: 0,              // 错误数量 
+      rightNum: 0,              // 成功数量
+      selectItem: <any>null,    // 选择数据
       columns,                  // 表格头部
       addUserVisible: false,    // 显示添加用户弹层  
       pagination :{             // 分页配置
@@ -116,15 +101,15 @@ export default defineComponent({
         total: 0,
         current:1,
       },
-      editingKey: '',
-      checkSave: false,  // 判断是否有未保存的数据
-      cacheData: <any>[],
-      vehTypes: store.state.vehTypes
-    }); 
-    const changeTerminalType = (value:any,text:any) => {
-      text = value;
-    }
+      editingKey: '',           // 正在编辑的key
+      checkSave: false,         // 判断是否有未保存的数据
+      cacheData: <any>[],       // 表格修改中间间
+      vehTypes: store.state.vehTypes     // 获取所有终端选项
+    });
+
+    // 下一步
     const next = async () => {
+      // 判断是否有正确的数据
       if(data.rightNum === 0){
         ElMessage.error('没有可提交的数据,请先处理...！');return false;
       }
@@ -134,7 +119,13 @@ export default defineComponent({
       }
       emit('next');
     }
-    //错误提醒对话框 
+
+    // 上一步
+    const back = () => {
+      emit('back');
+    }
+
+    // 错误提醒对话框 
     const checkError = () => {
       Modal.confirm({
         title: '导入提交？',
@@ -146,9 +137,8 @@ export default defineComponent({
         },
       });
     }
-    const back = () => {
-      emit('back');
-    }
+    
+    // 监听上传数据 返回数据集
     watch(()=>props.uploadData,(value:any)=>{
       data.errorNum = value.data.errorNum;
       data.rightNum = value.data.rightNum;
@@ -159,9 +149,8 @@ export default defineComponent({
         data.cacheData = data.tableData.map((item:any) => ({ ...item }));
       }
     });
-    const stepsImportEditOk = (item:any) =>{
-      data.selectItem = item;
-    }
+    
+    // 输入框 改变事件
     const handleChange = (value:any, key:any, column:any) => {
       const newData = [...data.tableData];
       const target = newData.filter(item => key === item.id)[0];
@@ -170,6 +159,8 @@ export default defineComponent({
         data.tableData = newData;
       }
     }
+
+    // 修改功能 代码段来自官方例子
     const edit =(key:any) => {
       data.checkSave = true;
       const newData = [...data.tableData];
@@ -180,6 +171,8 @@ export default defineComponent({
         data.tableData = newData;
       }
     }
+
+    // 保存功能  代码段来自官方例子
     const save = async (key:any) => {
       data.checkSave = false;
       const newData = [...data.tableData];
@@ -211,8 +204,9 @@ export default defineComponent({
         data.cacheData = newCacheData;
       }
       data.editingKey = '';
-      
     }
+
+    // 取消修改功能 代码段来自官方例子
     const cancel = (key:any) =>{
       data.checkSave = false;
       const newData = [...data.tableData];
@@ -229,8 +223,6 @@ export default defineComponent({
       next,
       cancel,
       save,
-      stepsImportEditOk,
-      changeTerminalType,
       handleChange,
       back,
       ...toRefs(data)

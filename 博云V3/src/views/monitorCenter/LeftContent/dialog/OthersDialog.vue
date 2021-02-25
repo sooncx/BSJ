@@ -173,6 +173,11 @@
         :vehInfo="vehInfo"
         v-if="['照片库'].includes(DialogType)"
       />
+      <VideoPlayback
+        v-bind="$attrs"
+        :vehInfo="vehInfo"
+        v-if="['录像回放'].includes(DialogType)"
+      />
       <Switch
         v-bind="$attrs"
         :DialogType="DialogType"
@@ -275,6 +280,9 @@ export default defineComponent({
     PhotoLibrary: defineAsyncComponent(
       () => import("./contents/PhotoLibrary/index.vue")
     ),
+    VideoPlayback: defineAsyncComponent(
+      () => import("./contents/VideoPlayback/index.vue")
+    ),
   },
   props: {
     vehInfo: {
@@ -344,7 +352,9 @@ export default defineComponent({
       }
     });
     const width = computed(() => {
-      if (["OBD数据"].includes(props.DialogType)) {
+      if (["录像回放"].includes(props.DialogType)) {
+        return "1000px";
+      } else if (["OBD数据"].includes(props.DialogType)) {
         return "680px";
       } else if (["无线回传"].includes(props.DialogType)) {
         return "640px";

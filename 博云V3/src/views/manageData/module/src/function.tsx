@@ -10,11 +10,6 @@ export function toTreeData(data: any, attributes: any) {
   const map = new Map(dataCopy.map((item:any) => [item[attributes.id], item]));
   const treeData:any[] = [];
   dataCopy.map((item:any) => {
-    // if(attributes.corpName){
-    //   item.slots = {
-    //     icon
-    //   }
-    // }
     const parent:any = map.get(item[attributes.parentId]);
     if (parent) {
       (parent.children || (parent.children = [])).push(item); // parent 引用 item

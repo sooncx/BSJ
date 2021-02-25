@@ -87,6 +87,7 @@ export default defineComponent({
     // 清除覆盖物
     const clearAll = () => {
       map.clearMap();
+      carMarker = null;
     };
 
     const getPoints = (mark: any, type: string) => {
@@ -270,6 +271,7 @@ export default defineComponent({
     const drawCar = () => {
       if (carMarker) {
         carMarker.setPosition(polylineArr[state.playIndex]);
+        carMarker.setAngle(angleArr[state.playIndex]);
       } else {
         carMarker = new AMap.Marker({
           map: map,

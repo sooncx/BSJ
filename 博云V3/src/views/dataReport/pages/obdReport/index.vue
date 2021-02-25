@@ -31,6 +31,8 @@
             v-permission="151301"
             >搜索</a-button
           >
+
+          <ColumnSelect v-model:value="tableColumns" />
         </div>
       </div>
     </template>
@@ -58,6 +60,7 @@ export default defineComponent({
   components: {
     BasicTemplate,
     SelectDate,
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
@@ -123,47 +126,56 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "plate",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "terminalNo",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "groupName",
+        visible: true
       },
       {
         title: "报警类型",
         align: "center",
         key: "type",
+        visible: true
       },
       {
         title: "开始时间",
         align: "center",
         key: "startTime",
+        visible: true
       },
       {
         title: "结束时间",
         align: "center",
         key: "endTime",
+        visible: true
       },
       {
         title: "报警次数",
         align: "center",
         key: "num",
+        visible: true
       },
       {
         title: "报警明细",
         align: "center",
         key: "operation",
         slots: { customRender: "operation" },
+        visible: true
       },
     ]);
 

@@ -15,23 +15,24 @@ import {
   ref,
   toRefs,
   watch,
+  inject,
+  Ref,
 } from "vue";
 export default defineComponent({
-  props: {
-    slideBoxShow: {
-      type: Boolean,
-      default: false,
-    },
-  },
+  props: {},
   setup(props) {
+    const videoFlag = <Ref<boolean>>inject("videoFlag");
     const data = reactive({
       slideBox: ref<HTMLDivElement | null>(null),
     });
-    const { slideBoxShow } = toRefs(props);
+    let slideBoxShow = inject("slideBoxShow") as any; // 围栏/位置点/二押点侧边栏visible
     watch(slideBoxShow, (val) => {
       nextTick(() => {
         if (val) {
-          (data.slideBox as any).style.height = `calc(100% - 70px)`;
+          (data.slideBox as any).style.top = videoFlag.value ? `0px` : `56px`;
+          (data.slideBox as any).style.height = videoFlag.value
+            ? `calc(100% - 10px)`
+            : `calc(100% - 70px)`;
           (data.slideBox as any).style.opacity = 1;
         } else {
           (data.slideBox as any).style.height = 0;
@@ -56,7 +57,7 @@ export default defineComponent({
   top: 56px;
   right: 10px;
   position: absolute;
-  transition: all .2s;
+  transition: all 0.2s;
   overflow: hidden;
 }
 </style>

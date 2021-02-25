@@ -4,6 +4,7 @@
     :maskClosable="false"
     width="500px"
     class="rechargeMessage"
+    :zIndex="zIndex"
   >
   <template #footer>
       <a-button key="submit" type="primary" @click="handleOk">
@@ -20,12 +21,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,reactive, toRefs,watch, h} from "vue";
-import API from "@/api/manageData";
+import { defineComponent,reactive, toRefs} from "vue";
 export default defineComponent({
   name: "carRechargeMessageModal",
   setup(props, { emit }) {
     const data = reactive({
+      zIndex:2000
     });
     const handleOk = () => {
       emit("update:visible", false);

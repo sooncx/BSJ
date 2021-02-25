@@ -45,14 +45,17 @@
             v-permission="151501"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="151502"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="151502"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -77,6 +80,7 @@ export default defineComponent({
   components: {
     BasicTemplate,
     SelectDate,
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
@@ -137,31 +141,37 @@ export default defineComponent({
         title: "操作人",
         align: "center",
         key: "operater",
+        visible: true
       },
       {
         title: "平台类型",
         align: "center",
         key: "platformType",
+        visible: true
       },
       {
         title: "操作类型",
         align: "center",
         key: "operateType",
+        visible: true
       },
       {
         title: "执行结果",
         align: "center",
         key: "type",
+        visible: true
       },
       {
         title: "位置",
         align: "center",
         key: "address",
+        visible: true
       },
       {
         title: "时间",
         align: "center",
         key: "operateTime",
+        visible: true
       },
     ]);
 

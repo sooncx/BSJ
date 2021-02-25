@@ -16,7 +16,7 @@
       >
         <template v-for="(item, index) in tableColumns" :key="index">
           <el-table-column
-            v-if="item.width"
+            v-if="item.visible && item.width"
             :label="item.title"
             :prop="item.key"
             :header-align="item.align"
@@ -28,7 +28,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            v-else-if="item.minwidth"
+            v-else-if="item.visible && item.minwidth"
             :label="item.title"
             :prop="item.key"
             :header-align="item.align"
@@ -40,7 +40,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            v-else
+            v-else-if="item.visible"
             :label="item.title"
             :prop="item.key"
             :header-align="item.align"

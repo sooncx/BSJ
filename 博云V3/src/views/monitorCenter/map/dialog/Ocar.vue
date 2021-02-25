@@ -80,7 +80,7 @@
               v-if="total > 0"
               type="primary"
               @click="exportData(selectedTag)"
-            >{{selectedTag == 4?"掉电导出":selectedTag == 1?"全部导出":"出入库导出"}}</el-button>
+            >{{selectedTag == 4?"掉电导出":selectedTag == 1?"全部导出":selectedTag == 2?"在库导出":"出库导出"}}</el-button>
           </span>
         </span>
       </div>
@@ -252,10 +252,8 @@ export default defineComponent({
         if (type == 1) {
           exportInOutVehicleReport({});
           exportInOutVehicleReport({ status: 3 });
-        } else if ([2, 3].includes(type)) {
-          exportInOutVehicleReport({});
-        } else if (type == 4) {
-          exportInOutVehicleReport({ status: 3 });
+        } else {
+          exportInOutVehicleReport({ status: type - 1 });
         }
       },
       async getTableData() {

@@ -61,14 +61,17 @@
             v-permission="150401"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="150402"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="150402"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -88,6 +91,7 @@ export default defineComponent({
   name: "parkingReport",
   components: {
     BasicTemplate,
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
@@ -163,43 +167,51 @@ export default defineComponent({
         title: "车牌号",
         align: "center",
         key: "plate",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "terminalNo",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "groupName",
+        visible: true
       },
       {
         title: "车辆类型",
         align: "center",
         key: "terminalType",
+        visible: true
       },
       {
         title: "停车开始时间",
         align: "center",
         key: "beginTime",
         minwidth: 120,
+        visible: true
       },
       {
         title: "停车时长",
         align: "center",
         key: "displayTimeStr",
+        visible: true
       },
       {
         title: "是否定位",
         align: "center",
         key: "isPosStr",
+        visible: true
       },
       {
         title: "位置",
         align: "center",
         key: "address",
         minwidth: 240,
+        visible: true
       },
     ]);
 

@@ -28,10 +28,12 @@ import { ElMessage } from 'element-plus';
 export default defineComponent({
   name: "carCustomNoRechargeModal",
   props: {
+    // 窗口类型 自定义不续费 | 自定义不续费转出 | 自定义续费
     customNoRechargeType: {
       type: Number,
       default: 0
     },
+    // 显示状态
     visible: {
       type: Boolean,
       default: false,
@@ -51,6 +53,7 @@ export default defineComponent({
       devNo: '',
     });
 
+    // 自定义续费功能
     async function customBatchRecharge(){
       if(!data.devNo) ElMessage.error('请填写设备号');
       emit('customBatchRechargeOk',data.devNo);
@@ -65,6 +68,7 @@ export default defineComponent({
     });
 
     async function customNoRechargeHandleOk(){
+      // 判断是否自定义续费
       if(props.customNoRechargeType === 3){
         customBatchRecharge();
         return;
@@ -78,9 +82,7 @@ export default defineComponent({
         if(!info.terminalNos) throw '请填写设备号';
         info.terminalNos = info.terminalNos.replace(/\r\n/g,",").replace(/\n/g,",")
         const { obj,flag,msg } = await API.batchTransferState(info);
-        if(flag !== 1){
-          throw msg
-        }
+        if(flag !== 1) throw msg;
         emit('customNoRechargeOk',obj.data);
         emit("update:visible", false);
       }catch(error){
@@ -93,7 +95,7 @@ export default defineComponent({
       emit("update:visible", false);
     }
 
-    watch(()=>props.visible,(value)=>{
+    watch(()=>props.visible,()=>{
       switch(props.customNoRechargeType){
         case 1:
           data.title = '自定义不续费';

@@ -19,14 +19,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,defineAsyncComponent,computed,reactive, toRefs,watch} from "vue";
+import { defineComponent,defineAsyncComponent,computed,reactive, toRefs} from "vue";
 export default defineComponent({
   name: "carSettleListModal",
   props: {
+    // 车辆ID
     vehicleId:{
       type: Number,
       default: 0,
     },
+    // 显示状态
     visible:{
       type:Boolean,
       default: false,
@@ -43,10 +45,12 @@ export default defineComponent({
       devNo: '',
       settVisible: true,
     });
+    // 结清功能确认回调
     const SettlementConfirm = () => {
       emit('settlementConfirm');
       emit("update:visible", false);
     }
+    // 结清功能取消回调
     const SettlementCancle = () => {
       emit("update:visible", false);
     }

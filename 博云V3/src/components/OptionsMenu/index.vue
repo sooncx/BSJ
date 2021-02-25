@@ -9,7 +9,7 @@
     >
       <slot
         name="content"
-        v-if="menuType =='area'"
+        v-if="menuType == 'area'"
       />
       <div
         class="options"
@@ -17,12 +17,12 @@
       >
         <ul id="popOption_ul">
           <li
-            :id="'popOption_'+items"
+            :id="'popOption_' + items"
             v-for="items in optionList"
             :key="items"
             @click="popFn(items)"
           >
-            <div v-if="items.name != '关注度设置'">{{items.name}}</div>
+            <div v-if="items.name != '关注度设置'">{{ items.name }}</div>
             <div v-else>
               <el-popover
                 placement="right"
@@ -30,7 +30,7 @@
                 trigger="hover"
               >
                 <template #reference>
-                  <span>{{items.name}} ></span>
+                  <span>{{ items.name }} ></span>
                 </template>
                 <div class="secondMenu">
                   <ul>
@@ -39,7 +39,7 @@
                       :key="index2"
                       @click="setAttention(item2)"
                     >
-                      {{item2}}
+                      {{ item2 }}
                     </li>
                   </ul>
                 </div>
@@ -69,7 +69,6 @@
     v-bind="$attrs"
     :Attentionlevel="Attentionlevel"
   />
-
 </template>
 <script lang="ts">
 import { useStore } from "vuex";
@@ -202,6 +201,7 @@ export default defineComponent({
       DialogTitle: "",
       attentionList: ["高", "中", "低", "修改备注", "清除关注"],
       optionList: [] as any,
+      // 清除关注度
       async deleteVehicleConcernFn() {
         let vehId = null;
         if (attrs.vehInfo && (attrs.vehInfo as any).V) {
@@ -213,6 +213,7 @@ export default defineComponent({
           showMsg("清除关注成功!");
         }
       },
+      // 关注度设置
       async setAttention(val: string) {
         emit("update:popoverVisible", false);
         if (val == "清除关注") {
@@ -222,6 +223,7 @@ export default defineComponent({
           data.AttentionDialogVisible = true;
         }
       },
+      // 下发指令
       async sendCommand(codeData: any) {
         const params = {
           commandType: codeData.param || null,
@@ -233,10 +235,11 @@ export default defineComponent({
           showMsg(codeData.name + "命令已下发，结果请查看命令下发报表");
         }
       },
+      // 点击指令列表事件
       popFn(item: any) {
         const val = item.name;
         data.command = item;
-        if (val == "关注度设置") return;
+        if (["关注度设置"].includes(val)) return;
         emit("update:popoverVisible", false);
         console.log(item, props.popType, "popFn");
         if (["车辆资料"].includes(val)) {
@@ -266,6 +269,7 @@ export default defineComponent({
             "点名",
           ].includes(val)
         ) {
+          // 以上指令直接下发指令，无需自定义传参操作
           data.sendCommand(item);
         } else {
           data.OtherDialogVisible = true;
@@ -284,6 +288,7 @@ export default defineComponent({
         offset: document.body.clientHeight / 2,
       });
     };
+    // 获取指令列表数据
     function getList() {
       if (!attrs.vehInfo) return;
       if (store.state.terminalResource && store.state.terminalList) {
@@ -306,6 +311,7 @@ export default defineComponent({
         }
         if ([...listData.value].length == 0) {
           data.optionList = nameList;
+          data.optionList.push({ name: "录像回放" });
           if (
             store.state.btnPermission &&
             store.state.btnPermission.length > 0
@@ -331,15 +337,6 @@ export default defineComponent({
               data.optionList.push({ name: "关注度设置" });
             }
           }
-          // data.optionList.unshift({ name: "绑定省市区" });
-          // if ((attrs.vehInfo as any).settle == "0") {
-          //   data.optionList.unshift({ name: "结清" });
-          // }
-          // data.optionList.unshift({ name: "车辆资料" });
-          // if ((attrs.vehInfo as any).settle == "1") {
-          //   data.optionList.push({ name: "结清撤回" });
-          // }
-          // data.optionList.push({ name: "关注度设置" });
           data.marginTop = data.optionList.length * 33 + 10;
           if (data.marginTop > 300) {
             data.marginTop = 330;
@@ -364,6 +361,7 @@ export default defineComponent({
         data.marginTop = 190;
       }
     }
+    // 设置指令列表显示位置
     watch(
       popMouseEvent,
       (val) => {

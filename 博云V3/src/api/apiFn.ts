@@ -122,8 +122,10 @@ export function exportFile(json: string, params: object) {
   // 添加session_id
   arr.push("sessionId=" + store.state.sessionId);
   // 生成url
-  const url = `${newBaseUrl}/${newJson}?${arr.join("&")}`;
-
+  let url = `${newBaseUrl}/${newJson}?${arr.join("&")}`;
+  if(newJson.slice(0, 4) === "http"){
+    url = newJson;
+  }
   const elemIF = document.createElement("iframe");
   elemIF.src = url;
   elemIF.style.display = "none";

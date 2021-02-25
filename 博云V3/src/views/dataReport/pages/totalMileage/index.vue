@@ -24,14 +24,17 @@
             v-permission="150801"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="150802"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="150802"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -58,6 +61,7 @@ export default defineComponent({
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     FnIntroduction,
   },
   setup() {
@@ -104,31 +108,37 @@ export default defineComponent({
         title: "车牌号",
         align: "center",
         key: "PL",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "GN",
+        visible: true
       },
       {
         title: "最后时间",
         align: "center",
         key: "TI",
+        visible: true
       },
       {
         title: "设备类型",
         align: "center",
         key: "TY",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "TE",
+        visible: true
       },
       {
         title: "总里程(km)",
         align: "center",
         key: "MI",
+        visible: true
       },
     ]);
 

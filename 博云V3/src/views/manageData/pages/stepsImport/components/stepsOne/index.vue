@@ -41,17 +41,17 @@ import { ElMessage } from 'element-plus';
 export default defineComponent({
   setup(props,{emit}) {
     const data = reactive({
-      file: <any>null,
-      fileList: <any>[],
+      file: <any>null,                  // 上传文件
+      fileList: <any>[],                // 文件列表
       uploading: false,
     });
-
+    // 上传开始前
     const beforeUpload = (file:any) => {
       data.file = file;
       data.fileList = [file];
       return false;
     }
-
+    // 提交上传
     const handleUpload = async () => {
       const formData = new FormData();
       if(data.file === null){
@@ -62,9 +62,7 @@ export default defineComponent({
       data.uploading = true;
       try {
         const { obj,flag,msg } = await API.importVehicle(formData);
-        if(flag !== 1){
-          throw msg
-        }
+        if(flag !== 1) throw msg
         emit("uploadSuccess",obj);
         emit("next");
       } catch (error) {
@@ -74,6 +72,8 @@ export default defineComponent({
       data.fileList = [];
       data.uploading = false;
     }
+
+    // 下载模板
     const downTemplate = () => {
       API.getExportFile({});
     }
@@ -87,5 +87,55 @@ export default defineComponent({
 });
 </script>
 <style lang="less" scoped>
-@import "./index.less";
+.steps{
+  width: 457px;
+  height: 232px;
+  margin: 0 auto;
+  color: #000;
+  ::v-deep(.ant-upload-icon i){
+    font-size:80px;
+    color:#C0C4CC;
+  }
+  ::v-deep(.ant-upload-text){
+    color:#000  !important;
+    span{
+      color: #6BAAFF;
+    }
+  }
+  .tip {
+    margin-top:20px;
+    h1{
+      font-size: 16px;
+      font-weight: 700;
+      color: #0e60db;
+      margin-bottom: 10px;
+    }
+    ul {
+      text-align: left;
+      li{
+        font-size: 12px;
+        color:#333;
+      }
+      li span:first-child{
+        color:#0E60DB;
+        background-color: #DEEBFF;
+        width: 16px;
+        text-align: center;
+        line-height: 16px;
+        height: 16px;
+        display: inline-block;
+        border-radius: 50px;
+        margin: 8px;
+      }
+    }
+  }
+  
+  .action {
+    text-align: center;
+    margin-top: 30px;
+    button{
+      margin-right: 10px;
+    }
+  }
+}
 </style>

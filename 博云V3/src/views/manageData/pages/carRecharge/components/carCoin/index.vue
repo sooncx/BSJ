@@ -10,21 +10,21 @@
               <UserSearch placeholder="请选择用户" v-model:value="userInfoId" />
             </div>
           </div>
-          <div class="item" v-show="status === ''">
+          <div class="item" v-show="type === ''">
             <label>划拨币数</label>
             <div class="group">
               <a-input v-model:value="userRechargeForm.chargeNum"></a-input>
             </div>
           </div>
-          <div class="item button" v-show="status === ''">
+          <div class="item button" v-show="type === ''">
             <a-button type="primary" @click="userRecharge">划拨</a-button>
           </div>
-          <div class="item" v-show="status === 'log'">
+          <div class="item" v-show="type === 'log'">
             <label>选择日期</label>
             <SelectDate v-model:value="rangeDate" @selectDay="onExpireTime" dateType="all" />
           </div>
         </div>
-        <div class="header__top__right" v-show="status === 'log'">
+        <div class="header__top__right" v-show="type === 'log'">
           <div class="item button">
             <a-button type="primary" @click="onSearch">
               <template #icon><i class="iconfont icon icon-sousuo"></i></template>
@@ -87,7 +87,8 @@ export default defineComponent({
     SelectDate
   },
   props: {
-    status: {
+    // 空字符 车币划拨 log 车币划拨记录
+    type: {
       type: String,
       default: ''
     }
@@ -112,7 +113,7 @@ export default defineComponent({
         pageNumber: 0,
         pageSize:0,
       },
-      tableData : <any>[],                            //表格数据
+      tableData : <any>[],                            // 表格数据
       pagination :{                                   // 分页配置
         showTotal: (total:string) => `共 ${total} 条数据`,  // 显示总数
         showSizeChanger: true,                        // 是否允许选中 指定数量
@@ -126,7 +127,7 @@ export default defineComponent({
           "YYYY-MM-DD 00:00:00"
         ),
         dayJs(new Date()).format("YYYY-MM-DD 23:59:59"),
-      ],
+      ]
     });
 
     // 分页功能
@@ -162,9 +163,7 @@ export default defineComponent({
       data.search.pageSize = data.pagination.pageSize;
       try {
         const { obj,flag,msg } = await API.pageRechargeLog(data.search);
-        if(flag !== 1){
-          throw msg
-        }
+        if(flag !== 1) throw msg;
         data.tableData = obj.data.logList;
         data.pagination.total = data.tableData.length;
       } catch (error) {
@@ -175,9 +174,7 @@ export default defineComponent({
 
     nextTick(()=>{
       // 判断如果当前是记录 则去获取数据
-      if(props.status === 'log'){
-        getData();
-      }
+      if(props.type === 'log') getData();
     });
     
     // 划拨功能数据提交
@@ -186,11 +183,8 @@ export default defineComponent({
         data.userRechargeForm.userId = data.userInfoId;
         if(!data.userRechargeForm.chargeNum) throw '请输入划拨币数！！';
         if(!data.userRechargeForm.userId) throw '请选择用户！！';
-        
         const { obj,flag,msg } = await API.userRecharge(data.userRechargeForm);
-        if(flag !== 1){
-          throw msg
-        }
+        if(flag !== 1) throw msg;
         data.tableData.push({
           userBCorpName: obj.data.userBCorpName,
           userB: obj.data.userB,
@@ -219,5 +213,65 @@ export default defineComponent({
 </script>
 <style lang="less" scoped>
 @import "../../../../../dataReport/module/css/index";
-@import "./index.less";
+.carRecharge{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction:column;
+  .header{
+    padding: 0 17px;
+    margin-bottom: 10px;
+    &__top{
+      width: 100%;
+      display: flex;
+      line-height: 32px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      &__left,&__right{
+        display:flex;
+        flex-wrap: wrap;
+      }
+    }
+    .item{
+      display: flex;
+      margin-top:10px;
+      label{
+        display: inline-block;
+        margin-right:8px;
+      }
+      .group{
+        display: inline-block;
+      }
+      .dateInput{
+        input{
+          width: 50px;
+        }
+      }
+      margin-right:24px;
+    }
+    .button{
+      margin-right: 0px;
+      button{
+        margin-left: 8px;
+      }
+    }
+  }
+  .content{
+    display: flex;
+    flex: 1;
+    padding: 0 10px;
+    flex-direction: column;
+    .table{
+      flex:1;
+      position: relative;
+      border: 1px solid #e8e8e8;
+    }
+    .page{
+      padding: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
+
 </style>

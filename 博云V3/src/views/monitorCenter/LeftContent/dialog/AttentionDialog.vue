@@ -126,6 +126,7 @@ export default defineComponent({
             break;
         }
       },
+      // 获取备注列表
       async getRemarkListData() {
         const res = await getRemarkList();
         if (!res) return;

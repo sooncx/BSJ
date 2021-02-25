@@ -29,14 +29,17 @@
             v-permission="151101"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            v-permission="151102"
-            @click="debounceOnExpoert"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              v-permission="151102"
+              @click="debounceOnExpoert"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -66,6 +69,7 @@ export default defineComponent({
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
   },
   setup() {
     const loading = ref(false);
@@ -121,66 +125,79 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "plate",
+        visible: true
       },
       {
         title: "客户姓名",
         align: "center",
         key: "owner",
+        visible: true
       },
       {
         title: "客户电话",
         align: "center",
         key: "phone",
+        visible: true
       },
       {
         title: "当前总里程(km)",
         align: "center",
         key: "currentMileage",
+        visible: true
       },
       {
         title: "提前多少公里提醒",
         align: "center",
         key: "advanceKilometers",
+        visible: true
       },
       {
         title: "上次保养时间",
         align: "center",
         key: "lastMaintainTime",
+        visible: true
       },
       {
         title: "下次保养时间",
         align: "center",
         key: "nextTimeMaintainTime",
+        visible: true
       },
       {
         title: "上次保养里程",
         align: "center",
         key: "lastMileage",
+        visible: true
       },
       {
         title: "下次保养里程",
         align: "center",
         key: "nextCurrentMileage",
+        visible: true
       },
       {
         title: "提前多少天设置",
         align: "center",
         key: "leadTime",
+        visible: true
       },
       {
         title: "提示内容",
         align: "center",
         key: "tips",
+        visible: true
       },
       {
         title: "备注",
         align: "center",
         key: "remark",
+        visible: true
       },
     ]);
 

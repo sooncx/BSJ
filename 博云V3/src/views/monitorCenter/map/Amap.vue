@@ -7,7 +7,6 @@
     ref="InfoWindowRef"
     v-model:selectedVeh="selectedVeh"
     v-show="selectedVeh"
-    :mapType="mapType"
     @closeInfoWindow="closeInfoWindow"
     @infoWindowFn="infoWindowFn"
   />
@@ -32,9 +31,6 @@ import {
   onUpdated,
 } from "vue";
 import { useAmap } from "./Amap";
-// import InfoWindow from "./infoWindow.vue";
-import { message } from "ant-design-vue";
-import { TwoCoordinateAzimuth } from "@/assets/js/base";
 import GPS from "@/assets/js/GPS";
 export default defineComponent({
   components: {
@@ -42,10 +38,6 @@ export default defineComponent({
     Panorama: defineAsyncComponent(() => import("./panorama.vue")),
   },
   props: {
-    mapType: {
-      type: String,
-      default: "",
-    },
     Satellite: {
       type: Boolean,
       default: false,
@@ -80,13 +72,12 @@ export default defineComponent({
     let updateNowMapRef = inject("updateNowMapRef") as Function; // 地图ref
     let associatedVehs = inject("associatedVehs") as any; // 关联车辆
     let choseAssociatedVehs = inject("choseAssociatedVehs") as any; // 选中关联车辆
-    let mapType_type = inject("mapType_type") as any;
+    let mapType = inject("mapType") as any;
     let PanoramaShow = ref(false);
     let PanoramaData = ref({}) as any;
     let traceOpen = ref(false);
     let trackVehs = ref([]) as any;
     let {
-      mapType,
       Satellite,
       Traffic,
       centerPoint,
@@ -172,11 +163,12 @@ export default defineComponent({
           immediate: true,
         }
       );
+      // 监听点击关联车辆列表
       watch(
         choseAssociatedVehs,
         (val: any, old: any) => {
           // if (!InfoWindowRef.value) return;
-          if(mapType_type.value != "Amap") return;
+          if(mapType.value != "Amap") return;
           setTimeout(() => {
             judgeIsZoomMarker(val, old) &&
               zoomMarker(
@@ -190,10 +182,11 @@ export default defineComponent({
           immediate: true,
         }
       );
+      // 监听关联车辆列表数据
       watch(
         associatedVehs,
         (val: any) => {
-          if(mapType_type.value != "Amap") return;
+          if(mapType.value != "Amap") return;
           if (!val || val.length == 0) {
             dwawAssociateMarker([]);
           } else {
@@ -210,6 +203,7 @@ export default defineComponent({
           immediate: true,
         }
       );
+      // 监听追踪开关
       watch(
         traceOpen,
         (val, old) => {
@@ -276,6 +270,7 @@ export default defineComponent({
           deep: true,
         }
       );
+      // 地图双击缩放功能开关
       function setMapOption(e: any) {
         const dom = document.getElementsByClassName("infoWindow")[0];
         if (dom && dom.contains(e.target)) {
@@ -311,7 +306,7 @@ export default defineComponent({
     //判断是否跳转当前车辆
     function judgeIsZoomMarker(nowVal: any, curVal: any) {
       if (!nowVal) return false;
-      if (props.mapType != "Amap") return false;
+      if (mapType.value != "Amap") return false;
       if (!curVal) return true;
       if (nowVal.V === curVal.V) {
         return nowVal.Y === curVal.Y && nowVal.X === curVal.X ? false : true;
@@ -319,6 +314,7 @@ export default defineComponent({
         return true;
       }
     }
+    // 信息窗口选项事件
     function infoWindowFn(event: any, item: any) {
       const veh = props.selectedVeh;
       switch (item.label) {

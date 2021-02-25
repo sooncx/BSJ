@@ -4,14 +4,14 @@
       <a-button key="back" @click="handleBack">
         返回
       </a-button>
-      <a-button key="submit" type="primary" :loading="modalLoading" @click="handleOk">
+      <a-button key="submit" type="primary" @click="handleOk">
         确定
       </a-button>
     </template>
     <div class="body">
       <div class="body__left">
         <manageDataTree 
-        v-model:treeDataArray="resultData" 
+        v-model:treeDataArray="groupData" 
         searchTitle="请输入车组名" 
         :parentKey="{id:'gi',parentId: 'pi'}"
         :setting="false"
@@ -41,10 +41,9 @@
   </a-modal>
 </template>
 <script lang="ts">
-import { defineComponent,reactive, toRefs,ref, PropType,watch,watchEffect,computed} from "vue";
+import { defineComponent,reactive, toRefs, watch,computed, nextTick} from "vue";
 import VehFuzzySearch from "@/components/VehGroup/src/VehFuzzySearch.vue";
 import { manageDataTree } from "@/views/manageData/module/index";
-import API from "@/api/vehGroup";
 import APIManage from "@/api/manageData";
 import { ElMessage } from 'element-plus';
 import { useStore } from "vuex";
@@ -55,14 +54,17 @@ export default defineComponent({
     manageDataTree
   },
   props: {
+    // 选择用户的ID
     selectUserId:{
       type: Number,
       default: 0
     },
+    // 窗口显示状态
     visible: {
       type: Boolean,
       default: false
     },
+    // 树默认勾选值
     selectedCheckedValue: {
       type: Array as any,
       default: []
@@ -70,30 +72,27 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const data = reactive({
-      modalLoading: false,
-      modalVisible: false,
-      fuzzyValue: {},
-      selectedCheckedKeys: <any>[],
-      resultData: <any>[],
-      selectData: <any>[],
+      selectedCheckedKeys: <any>[],                   // 左侧树 复选框默认值
+      groupData: <any>[],                             // 左侧树 树形数据
+      selectData: <any>[],                            // 右侧数 树形数据
     });
     const store = useStore();
+    // 获取 车组所有数据
     const getGroup = async () => {
       try {
-        data.resultData = new Array();
-        data.resultData = [...store.state.groupList];
+        data.groupData = [];
+        data.groupData = [...store.state.groupList];
       } catch (error) {
         ElMessage.error(error);
       }
     };
 
+    // 获取 当前用户已选择的车组数据
     const getlistUserGroup = async () => {
       try {
         if(props.selectUserId === 0) return false;
         const { obj,flag,msg } = await APIManage.listUserGroup({userId:props.selectUserId});
-        if(flag !== 1){
-          throw msg
-        }
+        if(flag !== 1) throw msg;
         let gvids = [] as any;
         let defaultVids = [] as any;
         obj.forEach((value:any)=>{
@@ -104,13 +103,15 @@ export default defineComponent({
           });
           defaultVids.push(value.groupId);
         });
+        // 左侧树 复选框默认选中
         data.selectedCheckedKeys = defaultVids;
+        // 右侧树 树行数据
         data.selectData = gvids;
       } catch (error) {
         ElMessage.error(error);
       }
     }
-
+    
     const show = computed({
       get: () => props.visible,
       set: (val) => {
@@ -118,30 +119,41 @@ export default defineComponent({
       },
     });
 
+    nextTick(()=>{
+      getGroup();
+    });
+
     watch(()=>props.visible,(value:any)=>{
       if(!value) return;
       data.selectedCheckedKeys = [];
       data.selectData = [];
+      // 判断是否有从添加用户表单里面的 新增车组
       if(props.selectedCheckedValue.length !== 0){
-        props.selectedCheckedValue.forEach((item:any)=>{
-          data.selectedCheckedKeys.push(item.gi);
+        getGroup();
+        nextTick(()=>{
+          props.selectedCheckedValue.forEach((item:any)=>{
+            data.selectedCheckedKeys.push(item.gi);
+          });
+          data.selectData = props.selectedCheckedValue;
         });
-        data.selectData = props.selectedCheckedValue;
       }
-      if(props.selectUserId){
-        getlistUserGroup();
-      }
-      getGroup();
+      
+      // 判断有选择用户ID
+      if(props.selectUserId) getlistUserGroup();
     });
-    getGroup();
+
+    // 左侧勾选车组数据
     const oncheck = (item:any) => {
       data.selectData = item;
     }
 
+    // 提交功能
     const handleOk = () => {
       emit("handleOk", data.selectData);
       emit("update:visible", false);
     }
+
+    // 返回功能
     const handleBack = () => {
       emit("update:visible", false);
     }

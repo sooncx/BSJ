@@ -55,6 +55,7 @@ export default defineComponent({
     GroupSelect
   },
   props: {
+    // 车组信息
     carGroupModelItem: {
       type: Object as PropType<any>,
       default: () => ({
@@ -64,10 +65,12 @@ export default defineComponent({
         pn: '',
       }),
     },
+    // 窗口状态 新增或修改
     carGroupModelType: {
       type: String as PropType<string>,
       default: ''
     },
+    // 窗口显示状态
     visible: {
       type: Boolean,
       default: false
@@ -76,22 +79,21 @@ export default defineComponent({
   setup(props, {emit}) {
     const store = useStore();
     const data = reactive({
-      modalVisible: false,
       modalLoading: false,
-      ruleForm: null as any,
+      ruleForm: null as any,          // form REF
       form: {
-        remark: '',
-        phone: '',
-        groupName: '',
-        parentId: 0,
-        groupId: <any>'',
+        remark: '',                   // 备注
+        phone: '',                    // 手机号码
+        groupName: '',                // 车组名字
+        parentId: 0,                  // 车组父类ID
+        groupId: <any>'',             // 车组ID
         fuzzyValue: <any>{
-          gi: '',
+          gi: '',                     // 上级车组ID
         }
       },
-      groupId: 0,
+      groupId: 0,                     // 选择车组ID
       visible:true,
-      title: '',
+      title: '',                      // 窗口显示标题
     });
 
     const showVisible = computed({
@@ -101,6 +103,7 @@ export default defineComponent({
       },
     });
 
+    // 返回顶级车组信息
     const groupParentData = () => {
       data.form.fuzzyValue = {gi: -1,gn:'车辆管理'};
     }
@@ -108,30 +111,27 @@ export default defineComponent({
     const getData = async () => {
       try {
         data.groupId = props.carGroupModelItem.gi;
-        if(props.carGroupModelItem.gi === 0) return false;
-        if(props.carGroupModelItem.gi === -3){
-          data.groupId = -1;
-        }
+        // 判断是否添加 添加则不用获取数据
+        if(data.groupId === 0) return false;
+        // 判断是否手动添加的顶级父类
+        if(data.groupId === -3) data.groupId = -1;
+        // 判断当前是顶级车组 显示默认值 
         if(data.groupId === -1){
           groupParentData();
           return false;
         }
         // 获取当前车组 详细数据
         const { obj,flag,msg } = await API.getGroup({ groupId:data.groupId });
-        if(flag !== 1){
-          throw msg
-        }
+        if(flag !== 1) throw msg;
+        // 判断修改
         if(props.carGroupModelType === 'edit'){
           data.form.phone = obj.data.phone;
           data.form.remark = obj.data.remark;
           data.form.groupName = obj.data.groupName;
           data.form.groupId = data.groupId;
-          if(obj.data.parentId === -1){
-            data.form.fuzzyValue = {gi: -1,gn:'车辆管理'};
-          }else{
-            data.form.fuzzyValue = {gi: obj.data.parentId,gn:obj.data.parentName};
-          }
-          
+          data.form.fuzzyValue = {gi: obj.data.parentId,gn:obj.data.parentName};
+          // 判断当前车组的父类是顶级车组 则显示默认值
+          if(obj.data.parentId === -1) groupParentData();
         }else{
           data.form.fuzzyValue = {gi: data.groupId,gn:obj.data.groupName};
           data.form.groupId = '';
@@ -146,18 +146,19 @@ export default defineComponent({
       data.form.groupName = '';
       data.form.remark = '';
       data.form.phone = '';
-      data.form.fuzzyValue = {
-        gi: ''
-      };
+      data.form.fuzzyValue = { gi: '' };
       data.title = props.carGroupModelType === 'edit' ? '编辑车组数据' : '新增车组'; 
       nextTick(()=>{
         getData();
       });
       
     });
-    // 更新缓存
+    // 创建更新注册器方法
     const fnName = inject("updateVehGroupData") as Function;
+
+    // 提交数据
     const handleOk = async () => {
+      data.modalLoading = true;
       const info = {
         groupName: data.form.groupName,
         parentId: data.form.fuzzyValue.gi,
@@ -170,36 +171,28 @@ export default defineComponent({
       }
       try {
         let data = {};
-        if(info.parentId === ''){
-          throw '请选择上级车组';
-        }
-        if(info.groupName === ''){
-          throw '请填写车组';
-        }
-        if(info.parentId === 0){
-          info.parentId = -1;
-        }
+        if(info.parentId === '') throw '请选择上级车组';
+        if(info.groupName === '') throw '请填写车组';
+        if(info.parentId === 0) info.parentId = -1;
+        // 判断当前是新增/修改
         if(props.carGroupModelType === 'add'){
           const { flag,msg,obj } = await API.addVehGroup(info)
-          if(flag !== 1){
-            throw msg
-          }
+          if(flag !== 1) throw msg;
           data = obj.data;
           ElMessage.success('添加成功');
         }else{
           const { flag,msg } = await API.updateVehicleGroup(info)
-          if(flag !== 1){
-            throw msg
-          }
+          if(flag !== 1) throw msg;
           ElMessage.success('修改成功');
         }
-        //更新缓存
+        //更新注射器 
         fnName();
         emit("groupModalHandleOk",data);
         emit("update:visible", false);
       } catch (error) {
         ElMessage.error(error);
       }
+      data.modalLoading = false;
     }
     const handleBack = () => {
       emit("update:visible", false);

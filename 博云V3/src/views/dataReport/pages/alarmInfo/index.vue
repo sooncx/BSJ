@@ -31,14 +31,17 @@
             v-permission="150101"
             >搜索</a-button
           >
-          <a-button
-            type="primary"
-            @click="debounceOnExpoert"
-            v-permission="150102"
-          >
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button
+              type="primary"
+              @click="debounceOnExpoert"
+              v-permission="150102"
+            >
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -72,7 +75,7 @@ import APIType from "@/api/dataReport/type";
 import VehGroupType from "@/components/VehGroup/src/type";
 import { useDebounce } from "@/hooks/core/useDebounce";
 import { useMessage } from "@/hooks/web/useMessage";
-import { useStore } from 'vuex';
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "offine",
@@ -83,6 +86,7 @@ export default defineComponent({
     ),
     SelectDate,
     AlarmModalBtn,
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     Detail: defineAsyncComponent(
       () => import("../../module/src/DetailModal.vue")
     ),
@@ -151,41 +155,49 @@ export default defineComponent({
         key: "index",
         width: 60,
         slots: { customRender: "index" },
+        visible: true
       },
       {
         title: "车牌号",
         align: "center",
         key: "plate",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "terminalNo",
+        visible: true
       },
       {
         title: "所属车组",
         align: "center",
         key: "groupName",
+        visible: true
       },
       {
         title: "报警类型",
         align: "center",
         key: "type",
+        visible: true
       },
       {
         title: "开始时间",
         align: "center",
         key: "startTime",
+        visible: true
       },
       {
         title: "结束时间",
         align: "center",
         key: "endTime",
+        visible: true
       },
       {
         title: "报警次数",
         align: "center",
         key: "num",
+        visible: true
       },
       {
         title: "报警明细",
@@ -193,6 +205,7 @@ export default defineComponent({
         key: "operation",
         width: 90,
         slots: { customRender: "operation" },
+        visible: true
       },
     ]);
 
@@ -219,7 +232,7 @@ export default defineComponent({
         endTime: rangeDate.value[1],
         longStay: 0,
         alarmTypes: alarmList.value.join(","),
-        sessionId: store.state.sessionId
+        sessionId: store.state.sessionId,
       };
 
       const { flag, msg } = await API.exportAlarm(info);

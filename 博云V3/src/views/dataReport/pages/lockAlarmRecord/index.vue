@@ -31,10 +31,13 @@
             class="filter__searchbtn"
             >搜索</a-button
           >
-          <a-button type="primary" @click="onExport" v-permission="151402">
-            <i class="iconfont icon-daochu"></i>
-            导出</a-button
-          >
+          <div>
+            <ColumnSelect v-model:value="tableColumns" />
+            <a-button type="primary" @click="onExport" v-permission="151402">
+              <i class="iconfont icon-daochu"></i>
+              导出</a-button
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -62,6 +65,7 @@ export default defineComponent({
     VehGroupSelect: defineAsyncComponent(
       () => import("@/components/VehGroup/src/VehGroupSelect.vue")
     ),
+    ColumnSelect: defineAsyncComponent(() => import('../../module/src/ColumnSelect.vue')),
     AlarmModalBtn,
   },
   setup() {
@@ -124,26 +128,31 @@ export default defineComponent({
         dataIndex: "index",
         align: "center",
         key: "index",
+        visible: true
       },
       {
         title: "设备号",
         align: "center",
         key: "terminalNo",
+        visible: true
       },
       {
         title: "报警类型",
         align: "center",
         key: "type",
+        visible: true
       },
       {
         title: "位置",
         align: "center",
         key: "startTime",
+        visible: true
       },
       {
         title: "时间",
         align: "center",
         key: "endTime",
+        visible: true
       },
     ]);
 
